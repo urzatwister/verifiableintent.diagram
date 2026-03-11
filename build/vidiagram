@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifiable Intent — Delegation Chain</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --card: #111820;
+    --border: #1c2633;
+    --text: #dfe6ed;
+    --muted: #5f7082;
+    --l1: #3b82f6;
+    --l1-bg: rgba(59,130,246,0.06);
+    --l1-border: rgba(59,130,246,0.2);
+    --l2: #f59e0b;
+    --l2-bg: rgba(245,158,11,0.06);
+    --l2-border: rgba(245,158,11,0.2);
+    --l3: #a855f7;
+    --l3-bg: rgba(168,85,247,0.06);
+    --l3-border: rgba(168,85,247,0.2);
+    --vis: #34d399;
+    --vis-bg: rgba(52,211,153,0.08);
+    --vis-border: rgba(52,211,153,0.18);
+    --sd: #f472b6;
+    --sd-bg: rgba(244,114,182,0.08);
+    --sd-border: rgba(244,114,182,0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+
+  .header {
+    max-width: 1600px;
+    margin: 0 auto 20px;
+  }
+
+  .header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--l1), var(--l3), var(--l2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto 20px;
+    flex-wrap: wrap;
+  }
+
+  .toggle {
+    display: inline-flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 3px;
+  }
+
+  .toggle button {
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    border-radius: 7px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    text-transform: capitalize;
+    transition: all 0.15s;
+  }
+
+  .toggle button.active {
+    background: var(--border);
+    color: var(--text);
+  }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-vis { background: var(--vis); }
+  .dot-sd { background: var(--sd); }
+
+  /* ── HORIZONTAL CHAIN ── */
+
+  .chain-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .chain {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    min-width: min-content;
+  }
+
+  .layer-card {
+    border-radius: 14px;
+    padding: 28px 20px 18px;
+    position: relative;
+    min-width: 280px;
+    max-width: 340px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .layer-card.l1 { background: var(--l1-bg); border: 1.5px solid var(--l1-border); }
+  .layer-card.l2 { background: var(--l2-bg); border: 1.5px solid var(--l2-border); }
+  .layer-card.l3 { background: var(--l3-bg); border: 1.5px solid var(--l3-border); }
+
+  .badge {
+    position: absolute;
+    top: -11px;
+    left: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: #fff;
+  }
+
+  .badge.l1 { background: #1a3660; }
+  .badge.l2 { background: #5c3d00; }
+  .badge.l3 { background: #4c1d95; }
+
+  .layer-title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .layer-title h2 {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .layer-title h2.l1 { color: var(--l1); }
+  .layer-title h2.l2 { color: var(--l2); }
+  .layer-title h2.l3 { color: var(--l3); }
+
+  .layer-title .typ {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .layer-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+
+  .field-group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 10px 0 4px;
+    padding-left: 2px;
+  }
+
+  .field {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    line-height: 1.45;
+    margin-bottom: 2px;
+  }
+
+  .field.vis { background: var(--vis-bg); border: 1px solid var(--vis-border); }
+  .field.sd { background: var(--sd-bg); border: 1px solid var(--sd-border); }
+
+  .field .dot { margin-top: 3px; }
+
+  .field .fname { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .field .fval { color: var(--muted); }
+  .field .fnote { color: var(--muted); font-size: 9.5px; font-style: italic; }
+
+  .field-content { min-width: 0; }
+
+  .note-box {
+    margin-top: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .note-box.l1 { background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.12); }
+  .note-box.l2 { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12); }
+  .note-box.l3 { background: rgba(168,85,247,0.05); border: 1px solid rgba(168,85,247,0.12); }
+
+  /* ── ARROWS ── */
+
+  .arrow-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 60px;
+    min-width: 100px;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .arrow-line {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .arrow-segment {
+    width: 28px;
+    height: 2px;
+  }
+
+  .arrow-segment.l1-l2 { background: linear-gradient(90deg, var(--l1), var(--l2)); }
+  .arrow-segment.l2-l3 { background: linear-gradient(90deg, var(--l2), var(--l3)); }
+
+  .arrow-head {
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+
+  .arrow-head.l1-l2 { border-left: 8px solid var(--l2); }
+  .arrow-head.l2-l3 { border-left: 8px solid var(--l3); }
+
+  .arrow-labels {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .arrow-label .highlight { font-weight: 700; }
+  .arrow-label .highlight.vis { color: var(--vis); }
+  .arrow-label .highlight.sd { color: var(--sd); }
+  .arrow-label .highlight.l1 { color: var(--l1); }
+  .arrow-label .highlight.l2 { color: var(--l2); }
+  .arrow-label .highlight.l3 { color: var(--l3); }
+
+  /* ── L3 SPLIT ── */
+
+  .l3-split {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .l3-split .layer-card {
+    min-width: 280px;
+    max-width: 320px;
+  }
+
+  .cross-ref {
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: var(--card);
+    border: 1px dashed var(--l3-border);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 320px;
+  }
+
+  .cross-ref .hl { color: var(--l3); font-weight: 700; }
+  .cross-ref .val { color: var(--vis); }
+
+  /* ── SUMMARY ── */
+
+  .summary {
+    max-width: 1600px;
+    margin: 24px auto 0;
+    padding: 16px 20px;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .summary .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .summary-row {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 2;
+    color: var(--muted);
+  }
+
+  .summary-row .l1 { color: var(--l1); }
+  .summary-row .l2 { color: var(--l2); }
+  .summary-row .l3 { color: var(--l3); }
+  .summary-row .w { color: var(--text); }
+  .summary-row .vis { color: var(--vis); }
+  .summary-row .sd { color: var(--sd); }
+
+  @media (max-width: 900px) {
+    .chain { flex-direction: column; align-items: stretch; }
+    .arrow-block { flex-direction: row; padding: 0; min-width: 0; justify-content: center; padding: 8px 0; }
+    .arrow-line { flex-direction: column; }
+    .arrow-segment { width: 2px; height: 20px; }
+    .arrow-head { border-top: none; border-bottom: none; border-left: 6px solid transparent; border-right: 6px solid transparent; }
+    .arrow-head.l1-l2 { border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--l2); }
+    .arrow-head.l2-l3 { border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--l3); }
+    .layer-card { max-width: 100%; }
+    .l3-split { flex-direction: column; }
+    .l3-split .layer-card { max-width: 100%; }
+    .cross-ref { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="label">Verifiable Intent · Credential Anatomy</div>
+  <h1>Delegation Chain — Field Visibility</h1>
+  <p>Each layer cryptographically binds the next via <code style="background:var(--card);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--l2);">cnf.jwk</code>. Fields are either always visible or selectively disclosable.</p>
+  <div style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);margin-top:10px;font-weight:600;">Diagram by CY Tan</div>
+</div>
+
+<div class="controls">
+  <div class="toggle" id="modeToggle">
+    <button class="active" data-mode="autonomous">Autonomous</button>
+    <button data-mode="immediate">Immediate</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="dot dot-vis"></div> Always visible</div>
+    <div class="legend-item"><div class="dot dot-sd"></div> Selectively disclosable</div>
+  </div>
+</div>
+
+<!-- ═══════════ AUTONOMOUS MODE ═══════════ -->
+
+<div class="chain-container" id="autonomousChain">
+<div class="chain">
+
+  <!-- L1 -->
+  <div class="layer-card l1">
+    <div class="badge l1">Layer 1 · Credential Provider</div>
+    <div class="layer-title"><h2 class="l1">L1 — Identity</h2><span class="typ">typ: "sd+jwt"</span></div>
+    <div class="layer-desc">Root credential. Signed by issuer. Binds user's public key. ~1 year.</div>
+
+    <div class="field-group-label">Header</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "sd+jwt"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">kid</span> <span class="fval">= issuer key id</span></div></div>
+
+    <div class="field-group-label">Payload</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iss</span> <span class="fval">= issuer URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sub</span> <span class="fval">= user id</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iat / exp</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= credential type URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">cnf.jwk</span> <span class="fval">= User Pub Key</span><br><span class="fnote">binds user → only they sign L2</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">pan_last_four</span> <span class="fval">= "1234"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">scheme</span> <span class="fval">= "mastercard"</span></div></div>
+
+    <div class="field-group-label">Selectively Disclosable</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">email</span><br><span class="fnote">only when identity check needed</span></div></div>
+
+    <div class="note-box l1">No sd_hash — root of chain</div>
+  </div>
+
+  <!-- Arrow L1 → L2 -->
+  <div class="arrow-block">
+    <div class="arrow-line">
+      <div class="arrow-segment l1-l2"></div>
+      <div class="arrow-segment l1-l2"></div>
+      <div class="arrow-head l1-l2"></div>
+    </div>
+    <div class="arrow-labels">
+      <div class="arrow-label">signed by key in<br>L1 <span class="highlight vis">cnf.jwk</span></div>
+      <div class="arrow-label">L2 <span class="highlight vis">sd_hash</span><br>= hash(L1)</div>
+    </div>
+  </div>
+
+  <!-- L2 Autonomous -->
+  <div class="layer-card l2">
+    <div class="badge l2">Layer 2 · User → Agent</div>
+    <div class="layer-title"><h2 class="l2">L2 — Intent</h2><span class="typ">typ: "kb-sd-jwt+kb"</span></div>
+    <div class="layer-desc">User sets constraints, delegates to agent via +kb. 24h–30 days.</div>
+
+    <div class="field-group-label">Header</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "kb-sd-jwt+kb"</span><br><span class="fnote">+kb enables delegation</span></div></div>
+
+    <div class="field-group-label">Payload — always visible</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">nonce</span> <span class="fnote">prevents replay</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">aud</span> <span class="fval">= network URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iat / exp</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sd_hash</span> <span class="fval">= hash(L1)</span><br><span class="fnote">binds L2 → L1</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">delegate_payload</span><br><span class="fnote">disclosure hash refs</span></div></div>
+
+    <div class="field-group-label">Checkout Mandate (SD → merchant)</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.checkout.open"</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">cnf.kid + cnf.jwk</span><br><span class="fnote">Agent key — only they sign L3</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">constraints[]</span><br><span class="fnote">allowed_merchant, line_items</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">prompt_summary</span></div></div>
+
+    <div class="field-group-label">Payment Mandate (SD → network)</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment.open"</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">cnf.kid + cnf.jwk</span><br><span class="fnote">same agent key as checkout</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">constraints[]</span><br><span class="fnote">amount, payee, reference, budget</span></div></div>
+
+    <div class="note-box l2">Nested SD: individual merchants &amp; items within constraints are also selectively disclosable</div>
+  </div>
+
+  <!-- Arrow L2 → L3 -->
+  <div class="arrow-block">
+    <div class="arrow-line">
+      <div class="arrow-segment l2-l3"></div>
+      <div class="arrow-segment l2-l3"></div>
+      <div class="arrow-head l2-l3"></div>
+    </div>
+    <div class="arrow-labels">
+      <div class="arrow-label">signed by key in<br>L2 mandate <span class="highlight sd">cnf.jwk</span></div>
+      <div class="arrow-label">L3 header <span class="highlight vis">kid</span><br>matches L2 <span class="highlight sd">cnf.kid</span></div>
+      <div class="arrow-label">L3 <span class="highlight vis">sd_hash</span><br>= hash(L2 + disclosures)</div>
+    </div>
+  </div>
+
+  <!-- L3 Split -->
+  <div class="l3-split">
+
+    <!-- L3a -->
+    <div class="layer-card l3">
+      <div class="badge l3">L3a · Agent → Payment Network</div>
+      <div class="layer-title"><h2 class="l3">L3a — Payment</h2><span class="typ">typ: "kb-sd-jwt"</span></div>
+      <div class="layer-desc">Final payment values for network. ~5 min.</div>
+
+      <div class="field-group-label">Header</div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "kb-sd-jwt"</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">kid</span> <span class="fval">= agent key id</span><br><span class="fnote">resolves via L2 cnf.kid match</span></div></div>
+
+      <div class="field-group-label">Payload — visible</div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">nonce / aud / iat / exp</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sd_hash</span><br><span class="fnote">hash(L2 + payment + merchant discl.)</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">delegate_payload</span></div></div>
+
+      <div class="field-group-label">Payment Mandate (SD → network)</div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment"</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">card type + token</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_amount</span><br><span class="fnote">{ currency, amount }</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payee</span> <span class="fnote">name + website</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">transaction_id</span><br><span class="fnote">= L3b checkout_hash</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">selected_merchant</span><br><span class="fnote">from L2 allowlist</span></div></div>
+
+      <div class="note-box l3">No cnf — terminal. No checkout details visible.</div>
+    </div>
+
+    <!-- L3b -->
+    <div class="layer-card l3">
+      <div class="badge l3">L3b · Agent → Merchant</div>
+      <div class="layer-title"><h2 class="l3">L3b — Checkout</h2><span class="typ">typ: "kb-sd-jwt"</span></div>
+      <div class="layer-desc">Final checkout details for merchant. ~5 min.</div>
+
+      <div class="field-group-label">Header</div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "kb-sd-jwt"</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">kid</span> <span class="fval">= agent key id</span><br><span class="fnote">resolves via L2 cnf.kid match</span></div></div>
+
+      <div class="field-group-label">Payload — visible</div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">nonce / aud / iat / exp</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sd_hash</span><br><span class="fnote">hash(L2 + checkout + item discl.)</span></div></div>
+      <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">delegate_payload</span></div></div>
+
+      <div class="field-group-label">Checkout Mandate (SD → merchant)</div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.checkout"</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">checkout_jwt</span><br><span class="fnote">merchant-signed cart</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">checkout_hash</span><br><span class="fnote">= L3a transaction_id</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">line_items</span><br><span class="fnote">SKUs, names, qty, prices</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">prompt_summary</span></div></div>
+
+      <div class="note-box l3">No cnf — terminal. No payment details visible.</div>
+    </div>
+
+    <div class="cross-ref">
+      <span class="hl">Cross-reference:</span>
+      L3a.<span class="val">transaction_id</span> == L3b.<span class="val">checkout_hash</span>
+      — binds both to the same checkout_jwt
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════ IMMEDIATE MODE ═══════════ -->
+
+<div class="chain-container" id="immediateChain" style="display:none;">
+<div class="chain">
+
+  <!-- L1 (same) -->
+  <div class="layer-card l1">
+    <div class="badge l1">Layer 1 · Credential Provider</div>
+    <div class="layer-title"><h2 class="l1">L1 — Identity</h2><span class="typ">typ: "sd+jwt"</span></div>
+    <div class="layer-desc">Root credential. Signed by issuer. Binds user's public key. ~1 year.</div>
+
+    <div class="field-group-label">Header</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "sd+jwt"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">kid</span> <span class="fval">= issuer key id</span></div></div>
+
+    <div class="field-group-label">Payload</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iss</span> <span class="fval">= issuer URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sub</span> <span class="fval">= user id</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iat / exp</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= credential type URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">cnf.jwk</span> <span class="fval">= User Pub Key</span><br><span class="fnote">binds user → only they sign L2</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">pan_last_four</span> <span class="fval">= "1234"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">scheme</span> <span class="fval">= "mastercard"</span></div></div>
+
+    <div class="field-group-label">Selectively Disclosable</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">email</span><br><span class="fnote">only when identity check needed</span></div></div>
+
+    <div class="note-box l1">No sd_hash — root of chain</div>
+  </div>
+
+  <!-- Arrow L1 → L2 -->
+  <div class="arrow-block">
+    <div class="arrow-line">
+      <div class="arrow-segment l1-l2"></div>
+      <div class="arrow-segment l1-l2"></div>
+      <div class="arrow-head l1-l2"></div>
+    </div>
+    <div class="arrow-labels">
+      <div class="arrow-label">signed by key in<br>L1 <span class="highlight vis">cnf.jwk</span></div>
+      <div class="arrow-label">L2 <span class="highlight vis">sd_hash</span><br>= hash(L1)</div>
+    </div>
+  </div>
+
+  <!-- L2 Immediate -->
+  <div class="layer-card l2">
+    <div class="badge l2">Layer 2 · User → Verifier</div>
+    <div class="layer-title"><h2 class="l2">L2 — Intent</h2><span class="typ">typ: "kb-sd-jwt"</span></div>
+    <div class="layer-desc">Final values confirmed by user. No delegation. Chain terminates. ~15 min.</div>
+
+    <div class="field-group-label">Header</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">alg</span> <span class="fval">= "ES256"</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">typ</span> <span class="fval">= "kb-sd-jwt"</span><br><span class="fnote">no +kb — no delegation</span></div></div>
+
+    <div class="field-group-label">Payload — always visible</div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">nonce</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">aud</span> <span class="fval">= network URI</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">iat / exp</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">sd_hash</span> <span class="fval">= hash(L1)</span><br><span class="fnote">binds L2 → L1</span></div></div>
+    <div class="field vis"><div class="dot dot-vis"></div><div class="field-content"><span class="fname">delegate_payload</span></div></div>
+
+    <div class="field-group-label">Checkout Mandate (SD → merchant)</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.checkout"</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">checkout_jwt</span><br><span class="fnote">final cart contents</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">checkout_hash</span><br><span class="fnote">SHA-256 of checkout_jwt</span></div></div>
+
+    <div class="field-group-label">Payment Mandate (SD → network)</div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment"</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">card type + token</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">currency + amount</span><br><span class="fnote">final values, minor units</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payee</span><br><span class="fnote">merchant name + website</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">transaction_id</span><br><span class="fnote">= checkout_hash</span></div></div>
+
+    <div class="note-box l2">No cnf in mandates — terminal. No constraints — values are final. User's signature is the authorization.</div>
+  </div>
+
+  <!-- No L3 indicator -->
+  <div class="arrow-block" style="opacity:0.4;">
+    <div class="arrow-line">
+      <div class="arrow-segment" style="background:var(--border);"></div>
+      <div class="arrow-segment" style="background:var(--border);"></div>
+    </div>
+    <div class="arrow-labels">
+      <div class="arrow-label" style="border-style:dashed;">No L3<br><span style="font-size:8px;">chain terminates at L2</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════ SUMMARY ═══════════ -->
+
+<div class="summary" id="summaryAuto">
+  <div class="title">Signature &amp; Binding Summary</div>
+  <div class="summary-row">
+    <span class="l1">L1</span> signed by <span class="w">Credential Provider key</span> · <span class="vis">cnf.jwk</span> = User Pub Key
+  </div>
+  <div class="summary-row">
+    <span class="l2">L2</span> signed by <span class="w">User key</span> (from L1 cnf) · <span class="vis">sd_hash</span> binds → L1 · <span class="sd">mandate cnf.jwk</span> = Agent Pub Key
+  </div>
+  <div class="summary-row">
+    <span class="l3">L3</span> signed by <span class="w">Agent key</span> (from L2 mandate cnf) · <span class="vis">sd_hash</span> binds → L2 · <span class="w">no cnf</span> (terminal)
+  </div>
+</div>
+
+<div class="summary" id="summaryImm" style="display:none;">
+  <div class="title">Signature &amp; Binding Summary</div>
+  <div class="summary-row">
+    <span class="l1">L1</span> signed by <span class="w">Credential Provider key</span> · <span class="vis">cnf.jwk</span> = User Pub Key
+  </div>
+  <div class="summary-row">
+    <span class="l2">L2</span> signed by <span class="w">User key</span> (from L1 cnf) · <span class="vis">sd_hash</span> binds → L1 · <span class="w">no cnf</span> — chain terminates
+  </div>
+</div>
+
+<script>
+  const toggle = document.getElementById('modeToggle');
+  const buttons = toggle.querySelectorAll('button');
+  const autoChain = document.getElementById('autonomousChain');
+  const immChain = document.getElementById('immediateChain');
+  const summAuto = document.getElementById('summaryAuto');
+  const summImm = document.getElementById('summaryImm');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mode = btn.dataset.mode;
+      autoChain.style.display = mode === 'autonomous' ? 'block' : 'none';
+      immChain.style.display = mode === 'immediate' ? 'block' : 'none';
+      summAuto.style.display = mode === 'autonomous' ? 'block' : 'none';
+      summImm.style.display = mode === 'immediate' ? 'block' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
