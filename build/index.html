@@ -489,7 +489,7 @@
     <div class="field-group-label">Payment Mandate (SD → network)</div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment.open"</span></div></div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">cnf.kid + cnf.jwk</span><br><span class="fnote">same agent key as checkout</span></div></div>
-    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">payment credential reference</span></div></div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">constraints[]</span><br><span class="fnote">amount, payee, reference, budget</span></div></div>
 
     <div class="note-box l2">Nested SD: individual merchants &amp; items within constraints are also selectively disclosable</div>
@@ -530,7 +530,7 @@
 
       <div class="field-group-label">Payment Mandate (SD → network)</div>
       <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment"</span></div></div>
-      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">card type + token</span></div></div>
+      <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">payment credential reference</span></div></div>
       <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_amount</span><br><span class="fnote">{ currency, amount }</span></div></div>
       <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payee</span> <span class="fnote">name + website</span></div></div>
       <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">transaction_id</span><br><span class="fnote">= L3b checkout_hash</span></div></div>
@@ -643,7 +643,7 @@
 
     <div class="field-group-label">Payment Mandate (SD → network)</div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">vct</span> <span class="fval">= "mandate.payment"</span></div></div>
-    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">card type + token</span></div></div>
+    <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payment_instrument</span><br><span class="fnote">payment credential reference</span></div></div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">currency + amount</span><br><span class="fnote">final values, minor units</span></div></div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">payee</span><br><span class="fnote">merchant name + website</span></div></div>
     <div class="field sd"><div class="dot dot-sd"></div><div class="field-content"><span class="fname">transaction_id</span><br><span class="fnote">= checkout_hash</span></div></div>
