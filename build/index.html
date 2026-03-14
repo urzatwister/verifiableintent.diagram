@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifiable Intent — Delegation Chain (Annotated)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --card: #141820;
+      --border: #232a38;
+      --text: #d4dbe6;
+      --muted: #6b7a90;
+      --l1: #2cb5a0;
+      --l1bg: rgba(44, 181, 160, .06);
+      --l1b: rgba(44, 181, 160, .20);
+      --l2: #e06458;
+      --l2bg: rgba(224, 100, 88, .06);
+      --l2b: rgba(224, 100, 88, .20);
+      --l3: #6872cf;
+      --l3bg: rgba(104, 114, 207, .06);
+      --l3b: rgba(104, 114, 207, .20);
+      --vi: #3fbf8f;
+      --vbg: rgba(63, 191, 143, .08);
+      --vb: rgba(63, 191, 143, .18);
+      --sd: #d47ea8;
+      --sbg: rgba(212, 126, 168, .08);
+      --sb: rgba(212, 126, 168, .18);
+      --ck: #4dc9d6;
+      --ch: #d98c4a;
+      --cd: #8a7fd6;
+      --cx: #d4a84b;
+      --req: #5ec290;
+      --opt: #d4a84b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      padding: 28px 20px;
+      min-height: 100vh
+    }
+
+    .hdr {
+      max-width: 1700px;
+      margin: 0 auto 16px
+    }
+
+    .hdr .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 5px
+    }
+
+    .hdr h1 {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--l1), var(--l3), var(--l2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -.5px;
+      margin-bottom: 3px
+    }
+
+    .hdr p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      max-width: 740px
+    }
+
+    .hdr .by {
+      font-size: 12px;
+      color: var(--text);
+      margin-top: 8px;
+      font-weight: 600
+    }
+
+    .ctrl {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 1700px;
+      margin: 0 auto 14px;
+      flex-wrap: wrap
+    }
+
+    .tog {
+      display: inline-flex;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px
+    }
+
+    .tog button {
+      background: 0;
+      color: var(--muted);
+      border: 0;
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Outfit';
+      transition: .15s
+    }
+
+    .tog button.on {
+      background: var(--border);
+      color: var(--text)
+    }
+
+    .leg {
+      display: flex;
+      gap: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      flex-wrap: wrap
+    }
+
+    .lgi {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted)
+    }
+
+    .dt {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .dtv {
+      background: var(--vi)
+    }
+
+    .dts {
+      background: var(--sd)
+    }
+
+    .ll {
+      max-width: 1700px;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .ll label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .ll input {
+      accent-color: var(--ck);
+      cursor: pointer
+    }
+
+    .lli {
+      display: flex;
+      gap: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      flex-wrap: wrap
+    }
+
+    .llx {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted)
+    }
+
+    .lb {
+      width: 18px;
+      height: 2px;
+      border-radius: 1px;
+      flex-shrink: 0
+    }
+
+    .lb.k {
+      background: var(--ck)
+    }
+
+    .lb.h {
+      background: repeating-linear-gradient(90deg, var(--ch) 0 3px, transparent 3px 6px)
+    }
+
+    .lb.d {
+      background: var(--cd)
+    }
+
+    .lb.x {
+      background: repeating-linear-gradient(90deg, var(--cx) 0 2px, transparent 2px 4px)
+    }
+
+    .sum {
+      max-width: 1700px;
+      margin: 0 auto 16px;
+      padding: 14px 18px;
+      background: var(--card);
+      border-radius: 10px;
+      border: 1px solid var(--border)
+    }
+
+    .sum .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px
+    }
+
+    .sum .r {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      line-height: 2;
+      color: var(--muted)
+    }
+
+    .sum .r .c1 {
+      color: var(--l1)
+    }
+
+    .sum .r .c2 {
+      color: var(--l2)
+    }
+
+    .sum .r .c3 {
+      color: var(--l3)
+    }
+
+    .sum .r .w {
+      color: var(--text)
+    }
+
+    .sum .r .v {
+      color: var(--vi)
+    }
+
+    .sum .r .s {
+      color: var(--sd)
+    }
+
+    .cc {
+      max-width: 1700px;
+      margin: 0 auto;
+      overflow-x: auto;
+      padding: 14px 0;
+      position: relative
+    }
+
+    .chn {
+      display: flex;
+      align-items: flex-start;
+      min-width: min-content;
+      position: relative
+    }
+
+    .lsvg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 10
+    }
+
+    .lc {
+      border-radius: 12px;
+      padding: 24px 16px 14px;
+      position: relative;
+      min-width: 310px;
+      max-width: 380px;
+      flex-shrink: 0;
+      margin-top: 4px
+    }
+
+    .lc.l1 {
+      background: var(--l1bg);
+      border: 1.5px solid var(--l1b)
+    }
+
+    .lc.l2 {
+      background: var(--l2bg);
+      border: 1.5px solid var(--l2b)
+    }
+
+    .lc.l3 {
+      background: var(--l3bg);
+      border: 1.5px solid var(--l3b)
+    }
+
+    .bdg {
+      position: absolute;
+      top: -10px;
+      left: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 10px;
+      color: #fff
+    }
+
+    .bdg.l1 {
+      background: #1a5a50
+    }
+
+    .bdg.l2 {
+      background: #6b3030
+    }
+
+    .bdg.l3 {
+      background: #363a70
+    }
+
+    .lt {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      margin-bottom: 2px
+    }
+
+    .lt h2 {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.3px
+    }
+
+    .lt h2.l1 {
+      color: var(--l1)
+    }
+
+    .lt h2.l2 {
+      color: var(--l2)
+    }
+
+    .lt h2.l3 {
+      color: var(--l3)
+    }
+
+    .lt .ty {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted)
+    }
+
+    .ld {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-bottom: 8px
+    }
+
+    .fg {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin: 8px 0 3px;
+      padding-left: 2px
+    }
+
+    .f {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      line-height: 1.4;
+      margin-bottom: 2px;
+      position: relative
+    }
+
+    .f.v {
+      background: var(--vbg);
+      border: 1px solid var(--vb)
+    }
+
+    .f.s {
+      background: var(--sbg);
+      border: 1px solid var(--sb)
+    }
+
+    .f .dt {
+      margin-top: 3px
+    }
+
+    .fc {
+      min-width: 0;
+      flex: 1
+    }
+
+    .fn {
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .fv {
+      color: var(--muted)
+    }
+
+    .fd {
+      display: block;
+      color: #7a8a9a;
+      font-size: 9px;
+      line-height: 1.35;
+      margin-top: 1px
+    }
+
+    .rq {
+      display: inline-block;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-left: 4px;
+      text-transform: uppercase
+    }
+
+    .rq.r {
+      background: rgba(74, 222, 128, .12);
+      color: var(--req);
+      border: 1px solid rgba(74, 222, 128, .2)
+    }
+
+    .rq.o {
+      background: rgba(250, 204, 21, .1);
+      color: var(--opt);
+      border: 1px solid rgba(250, 204, 21, .18)
+    }
+
+    .la {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 11
+    }
+
+    .la.ri {
+      right: -2.5px
+    }
+
+    .la.le {
+      left: -2.5px
+    }
+
+    .la.ak {
+      background: var(--ck);
+      box-shadow: 0 0 3px var(--ck)
+    }
+
+    .la.ah {
+      background: var(--ch);
+      box-shadow: 0 0 3px var(--ch)
+    }
+
+    .la.ad {
+      background: var(--cd);
+      box-shadow: 0 0 3px var(--cd)
+    }
+
+    .la.ax {
+      background: var(--cx);
+      box-shadow: 0 0 3px var(--cx)
+    }
+
+    .nb {
+      margin-top: 6px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      line-height: 1.45;
+      position: relative
+    }
+
+    .nb.l1 {
+      background: rgba(44, 181, 160, .04);
+      border: 1px solid rgba(44, 181, 160, .1)
+    }
+
+    .nb.l2 {
+      background: rgba(224, 100, 88, .04);
+      border: 1px solid rgba(224, 100, 88, .1)
+    }
+
+    .nb.l3 {
+      background: rgba(104, 114, 207, .04);
+      border: 1px solid rgba(104, 114, 207, .1)
+    }
+
+    .ab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 54px;
+      min-width: 90px;
+      flex-shrink: 0;
+      gap: 3px
+    }
+
+    .al {
+      display: flex;
+      align-items: center
+    }
+
+    .as {
+      width: 24px;
+      height: 2px
+    }
+
+    .as.a12 {
+      background: linear-gradient(90deg, var(--l1), var(--l2))
+    }
+
+    .as.a23 {
+      background: linear-gradient(90deg, var(--l2), var(--l3))
+    }
+
+    .arh {
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent
+    }
+
+    .arh.a12 {
+      border-left: 7px solid var(--l2)
+    }
+
+    .arh.a23 {
+      border-left: 7px solid var(--l3)
+    }
+
+    .als {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px
+    }
+
+    .alb {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.35
+    }
+
+    .alb .hl {
+      font-weight: 700
+    }
+
+    .alb .hv {
+      color: var(--vi)
+    }
+
+    .alb .hs {
+      color: var(--sd)
+    }
+
+    .l3s {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0
+    }
+
+    .l3s .lc {
+      min-width: 310px;
+      max-width: 370px
+    }
+
+    .xr {
+      margin-top: 4px;
+      padding: 6px 10px;
+      background: var(--card);
+      border: 1px dashed var(--l3b);
+      border-radius: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 370px
+    }
+
+    .xr .xh {
+      color: var(--l3);
+      font-weight: 700
+    }
+
+    .xr .xv {
+      color: var(--vi)
+    }
+
+    @media(max-width:900px) {
+      .chn {
+        flex-direction: column;
+        align-items: stretch
+      }
+
+      .ab {
+        flex-direction: row;
+        padding: 6px 0;
+        min-width: 0;
+        justify-content: center
+      }
+
+      .al {
+        flex-direction: column
+      }
+
+      .as {
+        width: 2px;
+        height: 16px
+      }
+
+      .arh {
+        border-top: 0;
+        border-bottom: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent
+      }
+
+      .arh.a12 {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 7px solid var(--l2)
+      }
+
+      .arh.a23 {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 7px solid var(--l3)
+      }
+
+      .lc {
+        max-width: 100%
+      }
+
+      .l3s .lc {
+        max-width: 100%
+      }
+
+      .xr {
+        max-width: 100%
+      }
+
+      .lsvg,
+      .la {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="hdr">
+    <div class="tag">Verifiable Intent v0.2 · Credential Anatomy</div>
+    <h1>Delegation Chain — Field-Level Bindings</h1>
+    <p>Each layer cryptographically binds the next via <code
+        style="background:var(--card);padding:1px 4px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--l2)">cnf.jwk</code>
+      (RFC 7800). Selective disclosure per RFC 9901.</p>
+    <div class="by">Diagram Drawn by CY Tan</div>
+  </div>
+
+  <div class="ctrl">
+    <div class="tog" id="mTog"><button class="on" data-m="auto">Autonomous</button><button
+        data-m="imm">Immediate</button></div>
+    <div class="leg">
+      <div class="lgi">
+        <div class="dt dtv"></div> Always visible
+      </div>
+      <div class="lgi">
+        <div class="dt dts"></div> Selectively disclosable
+      </div>
+      <div class="lgi"><span class="rq r">REQ</span> Required</div>
+      <div class="lgi"><span class="rq o">OPT</span> Optional</div>
+    </div>
+  </div>
+
+  <div class="sum" id="sA">
+    <div class="t">Signature &amp; Binding Summary · Autonomous (L1 + L2 + L3)</div>
+    <div class="r"><span class="c1">L1</span> signed by <span class="w">Credential Provider</span> · <span
+        class="v">cnf.jwk</span> = User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
+    <div class="r"><span class="c2">L2</span> signed by <span class="w">User</span> (L1 cnf) · <span
+        class="v">sd_hash</span>→L1 · <span class="s">mandate cnf.jwk</span> = Agent Key · typ: <span
+        class="w">kb-sd-jwt+kb</span> · 24h–30d</div>
+    <div class="r"><span class="c3">L3</span> signed by <span class="w">Agent</span> (L2 cnf) · <span
+        class="v">sd_hash</span>→L2+discl · header <span class="v">kid</span>=L2 <span class="s">cnf.kid</span> · typ:
+      <span class="w">kb-sd-jwt</span> · ~5min
+    </div>
+  </div>
+  <div class="sum" id="sI" style="display:none">
+    <div class="t">Signature &amp; Binding Summary · Immediate (L1 + L2)</div>
+    <div class="r"><span class="c1">L1</span> signed by <span class="w">Credential Provider</span> · <span
+        class="v">cnf.jwk</span> = User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
+    <div class="r"><span class="c2">L2</span> signed by <span class="w">User</span> (L1 cnf) · <span
+        class="v">sd_hash</span>→L1 · <span class="w">no cnf</span> — terminal · typ: <span class="w">kb-sd-jwt</span> ·
+      ~15min</div>
+  </div>
+
+  <div class="ll">
+    <label><input type="checkbox" id="showL" checked> Show field links</label>
+    <div class="lli">
+      <div class="llx">
+        <div class="lb k"></div>cnf.jwk → signs next layer
+      </div>
+      <div class="llx">
+        <div class="lb h"></div>sd_hash = hash(prior layer)
+      </div>
+      <div class="llx">
+        <div class="lb d"></div>kid ↔ cnf.kid match
+      </div>
+      <div class="llx">
+        <div class="lb x"></div>cross-reference (equality)
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ AUTONOMOUS ═══════════ -->
+  <div class="cc" id="cA">
+    <svg class="lsvg" id="svgA"></svg>
+    <div class="chn" id="chA">
+
+      <!-- ── L1 ── -->
+      <div class="lc l1">
+        <div class="bdg l1">Layer 1 · Credential Provider</div>
+        <div class="lt">
+          <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
+        </div>
+        <div class="ld">Root SD-JWT. Signed by Credential Provider. Binds user's public key. ~1 year.</div>
+
+        <div class="fg">Header (always visible)</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+              class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">typ</span> <span class="fv">= "sd+jwt"</span><span
+              class="rq r">REQ</span><span class="fd">SD-JWT token type (RFC 9901). Prevents type confusion.</span>
+          </div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">kid</span> <span class="fv">= issuer key id</span><span
+              class="rq r">REQ</span><span class="fd">Credential Provider's key id. Resolved via published JWKS.</span>
+          </div>
+        </div>
+
+        <div class="fg">Payload (always visible)</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iss</span> <span class="fv">= issuer URI</span><span
+              class="rq r">REQ</span><span class="fd">Credential Provider URI. Trust root for the chain.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">sub</span> <span class="fv">= user id</span><span
+              class="rq r">REQ</span><span class="fd">End-user subject identifier.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at
+              timestamp.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration. SHOULD ≤
+              1 year. Clock skew: 300s.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= credential type URI</span><span
+              class="rq r">REQ</span><span class="fd">Credential type profile (e.g. Mastercard card credential).</span>
+          </div>
+        </div>
+        <div class="f v" id="a1cnf">
+          <span class="la ri ak"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">cnf.jwk</span> <span class="fv">= User Pub Key</span><span
+              class="rq r">REQ</span><span class="fd">User's public key (RFC 7800). L2 MUST be signed by matching
+              private key.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">pan_last_four</span> <span class="fv">= "1234"</span><span
+              class="rq r">REQ</span><span class="fd">Last 4 PAN digits. Card identification for routing.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">scheme</span> <span class="fv">= "mastercard"</span><span
+              class="rq r">REQ</span><span class="fd">Payment scheme identifier.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Additional card
+              id. Multi-card disambiguation.</span></div>
+        </div>
+
+        <div class="fg">Selectively Disclosable</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">email</span><span class="rq o">OPT</span><span class="fd">User email.
+              Disclosed only for identity verification.</span></div>
+        </div>
+
+        <!-- Hash source anchor — represents "whole L1 credential" for sd_hash binding -->
+        <div class="nb l1" id="a1hash">
+          <span class="la ri ah"></span>
+          No sd_hash — root credential. The entire serialized L1 is hashed by L2's sd_hash.
+        </div>
+      </div>
+
+      <!-- Arrow L1→L2 -->
+      <div class="ab">
+        <div class="al">
+          <div class="as a12"></div>
+          <div class="as a12"></div>
+          <div class="arh a12"></div>
+        </div>
+        <div class="als">
+          <div class="alb">L2 signed by key in<br>L1 <span class="hl hv">cnf.jwk</span></div>
+          <div class="alb">L2 <span class="hl hv">sd_hash</span><br>= B64U(SHA-256(L1))</div>
+        </div>
+      </div>
+
+      <!-- ── L2 AUTONOMOUS ── -->
+      <div class="lc l2">
+        <div class="bdg l2">Layer 2 · User → Agent</div>
+        <div class="lt">
+          <h2 class="l2">L2 — Intent</h2><span class="ty">typ: "kb-sd-jwt+kb"</span>
+        </div>
+        <div class="ld">User's KB-SD-JWT+KB. Constraints + agent delegation via +kb. 24h–30 days.</div>
+
+        <div class="fg">Header</div>
+        <div class="f v" id="a2alg">
+          <span class="la le ak"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+              class="rq r">REQ</span><span class="fd">Signed by user's private key (from L1 cnf.jwk). Proves user
+              created L2.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">typ</span> <span class="fv">= "kb-sd-jwt+kb"</span><span
+              class="rq r">REQ</span><span class="fd">"+kb" enables delegation. Mandates carry cnf binding agent's
+              key.</span></div>
+        </div>
+
+        <div class="fg">Payload — always visible</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">nonce</span><span class="rq r">REQ</span><span class="fd">Cryptographic
+              nonce. Prevents replay across sessions.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
+              class="rq r">REQ</span><span class="fd">Audience — payment network. Prevents cross-context replay.</span>
+          </div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at. When user
+              created this mandate.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration.
+              Delegation window (24h–30 days).</span></div>
+        </div>
+        <div class="f v" id="a2sh">
+          <span class="la le ah"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">sd_hash</span> <span class="fv">= hash(L1)</span><span
+              class="rq r">REQ</span><span class="fd">= B64U(SHA-256(ASCII(serialized_L1))). Binds L2 → entire
+              L1.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">Array of
+              SD-JWT disclosure hash refs. Points to mandate claims.</span></div>
+        </div>
+
+        <div class="fg">Payment Mandate (SD → network)</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment.open"</span><span
+              class="rq r">REQ</span><span class="fd">Payment mandate type. ".open" = constraints for agent to
+              fulfill.</span></div>
+        </div>
+        <div class="f s" id="a2pkid">
+          <span class="la ri ad"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Same agent key id
+              as checkout. L3a header kid MUST match this.</span></div>
+        </div>
+        <div class="f s" id="a2pjwk">
+          <span class="la ri ak"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fd">Same agent public
+              key as checkout — MUST be identical (§12.7).</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">payment_instrument</span><span class="rq r">REQ</span><span
+              class="fd">Authorized payment credential (card/account) reference.</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">constraints[]</span><span class="rq r">REQ</span><span
+              class="fd">payment.amount, payment.allowed_payee, payment.reference, payment.budget,
+              payment.recurrence.</span></div>
+        </div>
+
+        <div class="fg">Checkout Mandate (SD → merchant)</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.open"</span><span
+              class="rq r">REQ</span><span class="fd">Checkout mandate type. ".open" = constraints, not final
+              values.</span></div>
+        </div>
+        <div class="f s" id="a2ckid">
+          <span class="la ri ad"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Agent's key
+              identifier. L3b header kid MUST match this value.</span></div>
+        </div>
+        <div class="f s" id="a2cjwk">
+          <span class="la ri ak"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fd">Agent's public
+              key. Only this key's holder can sign L3b. MUST be identical in both mandates.</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">constraints[]</span><span class="rq r">REQ</span><span class="fd">Typed
+              constraint array: allowed_merchant, line_items. Each entry is nested SD.</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">prompt_summary</span><span class="rq o">OPT</span><span
+              class="fd">Human-readable intent description. For audit trail.</span></div>
+        </div>
+
+        <!-- Hash source anchor — represents "whole L2 + disclosures" for L3 sd_hash -->
+        <div class="nb l2" id="a2hash">
+          <span class="la ri ah"></span>
+          Nested SD: merchants &amp; items within constraints are individually disclosable. L3 sd_hash covers L2 base
+          JWT + relevant disclosures only.
+        </div>
+      </div>
+
+      <!-- Arrow L2→L3 -->
+      <div class="ab">
+        <div class="al">
+          <div class="as a23"></div>
+          <div class="as a23"></div>
+          <div class="arh a23"></div>
+        </div>
+        <div class="als">
+          <div class="alb">L3 signed by key in<br>L2 mandate <span class="hl hs">cnf.jwk</span></div>
+          <div class="alb">L3 header <span class="hl hv">kid</span><br>= L2 mandate <span class="hl hs">cnf.kid</span>
+          </div>
+          <div class="alb">L3 <span class="hl hv">sd_hash</span><br>= hash(L2 + disclosures)</div>
+        </div>
+      </div>
+
+      <!-- ── L3 SPLIT ── -->
+      <div class="l3s">
+
+        <!-- L3a -->
+        <div class="lc l3">
+          <div class="bdg l3">L3a · Agent → Payment Network</div>
+          <div class="lt">
+            <h2 class="l3">L3a — Payment</h2><span class="ty">typ: "kb-sd-jwt"</span>
+          </div>
+          <div class="ld">Agent's finalized payment. Fulfills L2 payment constraints. ~5 min.</div>
+
+          <div class="fg">Header</div>
+          <div class="f v" id="a3aalg">
+            <span class="la le ak"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+                class="rq r">REQ</span><span class="fd">Signed by agent's private key (from L2 payment cnf.jwk).</span>
+            </div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">typ</span> <span class="fv">= "kb-sd-jwt"</span><span
+                class="rq r">REQ</span><span class="fd">Terminal. No +kb — no further delegation allowed.</span></div>
+          </div>
+          <div class="f v" id="a3akid">
+            <span class="la le ad"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
+                class="rq r">REQ</span><span class="fd">Matches L2 payment cnf.kid. Verifier resolves key from L2
+                cnf.jwk. MUST NOT include jwk header.</span></div>
+          </div>
+
+          <div class="fg">Payload — always visible</div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">nonce</span><span class="rq r">REQ</span><span class="fd">Fresh nonce.
+                Prevents payment replay.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
+                class="rq r">REQ</span><span class="fd">Audience — payment network receiving this.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at. When
+                agent created L3a.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration.
+                RECOMMENDED ~5 min.</span></div>
+          </div>
+          <div class="f v" id="a3ash">
+            <span class="la le ah"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">sd_hash</span><span class="rq r">REQ</span><span class="fd">= hash(L2 base
+                JWT + payment discl. + merchant discl.). NOT checkout disclosures.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">SD-JWT
+                disclosure refs for payment mandate fields.</span></div>
+          </div>
+
+          <div class="fg">Payment Mandate (SD → network)</div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment"</span><span
+                class="rq r">REQ</span><span class="fd">Final payment type (no ".open"). Concrete values.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">payment_instrument</span><span class="rq r">REQ</span><span
+                class="fd">Specific payment credential. Must match L2 authorized instrument.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">payment_amount</span><span class="rq r">REQ</span><span
+                class="fd">{currency, amount} in minor units. Verified against L2 constraints.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">payee</span><span class="rq r">REQ</span><span class="fd">{name, website}.
+                Verified against L2 payment.allowed_payee.</span></div>
+          </div>
+          <div class="f s" id="a3atx">
+            <span class="la le ax"></span>
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">transaction_id</span><span class="rq r">REQ</span><span class="fd">=
+                B64U(SHA-256(checkout_jwt)). MUST equal L3b checkout_hash.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">selected_merchant</span><span class="rq o">OPT</span><span
+                class="fd">Chosen from L2 allowed_merchant. Nested SD from L2.</span></div>
+          </div>
+
+          <div class="nb l3">No cnf in payload — terminal. Checkout details NOT visible to network.</div>
+        </div>
+
+        <!-- L3b -->
+        <div class="lc l3">
+          <div class="bdg l3">L3b · Agent → Merchant</div>
+          <div class="lt">
+            <h2 class="l3">L3b — Checkout</h2><span class="ty">typ: "kb-sd-jwt"</span>
+          </div>
+          <div class="ld">Agent's finalized checkout. Fulfills L2 checkout constraints. ~5 min.</div>
+
+          <div class="fg">Header</div>
+          <div class="f v" id="a3balg">
+            <span class="la le ak"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+                class="rq r">REQ</span><span class="fd">Signed by agent's private key (from L2 checkout cnf.jwk).</span>
+            </div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">typ</span> <span class="fv">= "kb-sd-jwt"</span><span
+                class="rq r">REQ</span><span class="fd">Terminal. No onward delegation.</span></div>
+          </div>
+          <div class="f v" id="a3bkid">
+            <span class="la le ad"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
+                class="rq r">REQ</span><span class="fd">Matches L2 checkout cnf.kid. Verifier resolves key from L2
+                cnf.jwk. MUST NOT include jwk.</span></div>
+          </div>
+
+          <div class="fg">Payload — always visible</div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">nonce</span><span class="rq r">REQ</span><span class="fd">Fresh nonce.
+                Prevents checkout replay.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">aud</span> <span class="fv">= merchant URI</span><span
+                class="rq r">REQ</span><span class="fd">Audience — merchant receiving this.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at. When
+                agent created L3b.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration.
+                RECOMMENDED ~5 min.</span></div>
+          </div>
+          <div class="f v" id="a3bsh">
+            <span class="la le ah"></span>
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">sd_hash</span><span class="rq r">REQ</span><span class="fd">= hash(L2 base
+                JWT + checkout discl. + item discl.). NOT payment disclosures.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">SD-JWT
+                disclosure refs for checkout mandate fields.</span></div>
+          </div>
+
+          <div class="fg">Checkout Mandate (SD → merchant)</div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout"</span><span
+                class="rq r">REQ</span><span class="fd">Final checkout type (no ".open"). Concrete selections.</span>
+            </div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span
+                class="fd">Merchant-signed cart JWT: items, qty, prices, currency, merchant id.</span></div>
+          </div>
+          <div class="f s" id="a3bch">
+            <span class="la le ax"></span>
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">checkout_hash</span><span class="rq r">REQ</span><span class="fd">=
+                B64U(SHA-256(checkout_jwt)). MUST equal L3a transaction_id.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">line_items</span><span class="rq o">OPT</span><span class="fd">Finalized
+                items: SKU, name, qty, price. Satisfies L2 constraints.</span></div>
+          </div>
+          <div class="f s">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">prompt_summary</span><span class="rq o">OPT</span><span
+                class="fd">Human-readable fulfillment summary for audit.</span></div>
+          </div>
+
+          <div class="nb l3">No cnf in payload — terminal. Payment details NOT visible to merchant.</div>
+        </div>
+
+        <div class="xr"><span class="xh">Cross-reference (§8.3):</span> L3a.<span class="xv">transaction_id</span> ==
+          L3b.<span class="xv">checkout_hash</span><br>Both = B64U(SHA-256(checkout_jwt)). Binds payment + checkout to
+          same transaction.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ IMMEDIATE ═══════════ -->
+  <div class="cc" id="cI" style="display:none">
+    <svg class="lsvg" id="svgI"></svg>
+    <div class="chn" id="chI">
+
+      <!-- ── L1 (Immediate) ── -->
+      <div class="lc l1">
+        <div class="bdg l1">Layer 1 · Credential Provider</div>
+        <div class="lt">
+          <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
+        </div>
+        <div class="ld">Same as Autonomous. Root SD-JWT. ~1 year.</div>
+        <div class="fg">Header</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+              class="rq r">REQ</span><span class="fd">ECDSA P-256 + SHA-256.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">typ</span> <span class="fv">= "sd+jwt"</span><span
+              class="rq r">REQ</span><span class="fd">SD-JWT token type.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">kid</span> <span class="fv">= issuer key id</span><span
+              class="rq r">REQ</span><span class="fd">Credential Provider key id.</span></div>
+        </div>
+        <div class="fg">Payload</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iss</span> <span class="fv">= issuer URI</span><span
+              class="rq r">REQ</span><span class="fd">Credential Provider URI.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">sub</span> <span class="fv">= user id</span><span
+              class="rq r">REQ</span><span class="fd">End-user identifier.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at
+              timestamp.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration. ≤ 1
+              year.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= credential type URI</span><span
+              class="rq r">REQ</span><span class="fd">Payment credential type profile.</span></div>
+        </div>
+        <div class="f v" id="i1cnf">
+          <span class="la ri ak"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">cnf.jwk</span> <span class="fv">= User Pub Key</span><span
+              class="rq r">REQ</span><span class="fd">User's public key. Only they sign L2.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">pan_last_four</span> <span class="fv">= "1234"</span><span
+              class="rq r">REQ</span><span class="fd">Last 4 PAN digits.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">scheme</span> <span class="fv">= "mastercard"</span><span
+              class="rq r">REQ</span><span class="fd">Payment network.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Multi-card
+              disambiguation.</span></div>
+        </div>
+        <div class="fg">Selectively Disclosable</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">email</span><span class="rq o">OPT</span><span class="fd">Identity
+              verification only.</span></div>
+        </div>
+        <div class="nb l1" id="i1hash">
+          <span class="la ri ah"></span>
+          No sd_hash — root credential. Entire serialized L1 is hashed by L2's sd_hash.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="ab">
+        <div class="al">
+          <div class="as a12"></div>
+          <div class="as a12"></div>
+          <div class="arh a12"></div>
+        </div>
+        <div class="als">
+          <div class="alb">L2 signed by key in<br>L1 <span class="hl hv">cnf.jwk</span></div>
+          <div class="alb">L2 <span class="hl hv">sd_hash</span><br>= hash(L1)</div>
+        </div>
+      </div>
+
+      <!-- ── L2 IMMEDIATE ── -->
+      <div class="lc l2">
+        <div class="bdg l2">Layer 2 · User → Verifier</div>
+        <div class="lt">
+          <h2 class="l2">L2 — Intent</h2><span class="ty">typ: "kb-sd-jwt"</span>
+        </div>
+        <div class="ld">Final values confirmed by user. No delegation. Chain terminates. ~15 min.</div>
+
+        <div class="fg">Header</div>
+        <div class="f v" id="i2alg">
+          <span class="la le ak"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
+              class="rq r">REQ</span><span class="fd">Signed by user's key from L1 cnf.jwk. Signature =
+              authorization.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">typ</span> <span class="fv">= "kb-sd-jwt"</span><span
+              class="rq r">REQ</span><span class="fd">No "+kb" — no delegation possible.</span></div>
+        </div>
+
+        <div class="fg">Payload — always visible</div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">nonce</span><span class="rq r">REQ</span><span class="fd">Anti-replay
+              nonce.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
+              class="rq r">REQ</span><span class="fd">Audience — payment network.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at
+              timestamp.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration. ~15 min
+              (user present).</span></div>
+        </div>
+        <div class="f v" id="i2sh">
+          <span class="la le ah"></span>
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">sd_hash</span> <span class="fv">= hash(L1)</span><span
+              class="rq r">REQ</span><span class="fd">= B64U(SHA-256(ASCII(serialized_L1))). Binds L2 → entire
+              L1.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">SD-JWT
+              disclosure refs for mandates.</span></div>
+        </div>
+
+        <div class="fg">Checkout Mandate (SD → merchant)</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout"</span><span
+              class="rq r">REQ</span><span class="fd">Final checkout. Completed cart, not constraints.</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span class="fd">Cart JWT:
+              items, qty, prices, currency, merchant.</span></div>
+        </div>
+        <div class="f s" id="i2ck">
+          <span class="la ri ax"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">checkout_hash</span><span class="rq r">REQ</span><span class="fd">=
+              B64U(SHA-256(checkout_jwt)). MUST equal transaction_id.</span></div>
+        </div>
+
+        <div class="fg">Payment Mandate (SD → network)</div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment"</span><span
+              class="rq r">REQ</span><span class="fd">Final payment. Exact values, not constraints.</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">payment_instrument</span><span class="rq r">REQ</span><span
+              class="fd">Payment credential (card/account).</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">currency</span><span class="rq r">REQ</span><span class="fd">ISO 4217 code
+              (e.g. "USD").</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">amount</span><span class="rq r">REQ</span><span class="fd">Minor units (e.g.
+              27999 = $279.99).</span></div>
+        </div>
+        <div class="f s">
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">payee</span><span class="rq r">REQ</span><span class="fd">{name, website}.
+              Merchant receiving payment.</span></div>
+        </div>
+        <div class="f s" id="i2tx">
+          <span class="la le ax"></span>
+          <div class="dt dts"></div>
+          <div class="fc"><span class="fn">transaction_id</span><span class="rq r">REQ</span><span class="fd">=
+              checkout_hash. Cross-binds payment → checkout.</span></div>
+        </div>
+
+        <div class="nb l2">No cnf in mandates — terminal. Values are final. User's signature = authorization. Agent
+          forwards only.</div>
+      </div>
+
+      <!-- No L3 -->
+      <div class="ab" style="opacity:.35">
+        <div class="al">
+          <div class="as" style="background:var(--border)"></div>
+          <div class="as" style="background:var(--border)"></div>
+        </div>
+        <div class="als">
+          <div class="alb" style="border-style:dashed">No L3<br><span style="font-size:7px">chain terminates at
+              L2</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /*
+      ARROW AUDIT — correct field-to-field mappings per spec §3.2:
+    
+      KEY BINDING (cyan solid): cnf.jwk → next layer's alg (signed by that key)
+        L1 cnf.jwk            → L2 alg
+        L2 checkout cnf.jwk   → L3b alg
+        L2 payment cnf.jwk    → L3a alg
+    
+      HASH BINDING (orange dashed): whole prior layer → next layer's sd_hash
+        L1 note-box (whole L1) → L2 sd_hash     (sd_hash = hash of entire serialized L1)
+        L2 note-box (whole L2) → L3a sd_hash    (sd_hash = hash of L2 + payment + merchant discl.)
+        L2 note-box (whole L2) → L3b sd_hash    (sd_hash = hash of L2 + checkout + item discl.)
+    
+      KID MATCH (purple solid): cnf.kid → next layer's header kid
+        L2 checkout cnf.kid    → L3b kid
+        L2 payment cnf.kid     → L3a kid
+    
+      CROSS-REFERENCE (yellow dashed, no arrowhead — equality):
+        L3a transaction_id     ↔ L3b checkout_hash
+    
+      IMMEDIATE MODE:
+        L1 cnf.jwk             → L2 alg         (key binding)
+        L1 note-box (whole L1) → L2 sd_hash     (hash binding)
+        L2 checkout_hash       ↔ L2 transaction_id (cross-ref within same card)
+    */
+
+    function pos(el, ch, side) {
+      var cr = ch.getBoundingClientRect(), er = el.getBoundingClientRect(), sl = ch.parentElement.scrollLeft || 0;
+      var y = er.top - cr.top + er.height / 2;
+      return side === 'r' ? { x: er.right - cr.left + sl + 2, y: y } : { x: er.left - cr.left + sl - 2, y: y };
+    }
+    function bez(x1, y1, x2, y2, t) {
+      if (t === 'xref') { var m = Math.min(x1, x2) - 26; return 'M' + x1 + ',' + y1 + ' C' + m + ',' + y1 + ' ' + m + ',' + y2 + ' ' + x2 + ',' + y2 }
+      if (t === 'xref-int') { var m2 = Math.max(x1, x2) + 26; return 'M' + x1 + ',' + y1 + ' C' + m2 + ',' + y1 + ' ' + m2 + ',' + y2 + ' ' + x2 + ',' + y2 }
+      var d = Math.abs(x2 - x1), c = Math.min(d * .4, 70);
+      return 'M' + x1 + ',' + y1 + ' C' + (x1 + c) + ',' + y1 + ' ' + (x2 - c) + ',' + y2 + ' ' + x2 + ',' + y2;
+    }
+    function draw(sid, cid, conns) {
+      var svg = document.getElementById(sid), ch = document.getElementById(cid);
+      if (!svg || !ch) return;
+      var w = ch.scrollWidth, h = ch.scrollHeight;
+      svg.setAttribute('width', w); svg.setAttribute('height', h);
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+      svg.style.width = w + 'px'; svg.style.height = h + 'px';
+      svg.innerHTML = '';
+      var cs = getComputedStyle(document.documentElement);
+      var C = { key: cs.getPropertyValue('--ck').trim(), hash: cs.getPropertyValue('--ch').trim(), kid: cs.getPropertyValue('--cd').trim(), xref: cs.getPropertyValue('--cx').trim() };
+      var df = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      Object.keys(C).forEach(function (n) {
+        var mk = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        mk.setAttribute('id', 'a-' + n); mk.setAttribute('viewBox', '0 0 8 6');
+        mk.setAttribute('refX', '7'); mk.setAttribute('refY', '3');
+        mk.setAttribute('markerWidth', '7'); mk.setAttribute('markerHeight', '5');
+        mk.setAttribute('orient', 'auto-start-reverse');
+        var pl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        pl.setAttribute('points', '0,0 8,3 0,6'); pl.setAttribute('fill', C[n]);
+        mk.appendChild(pl); df.appendChild(mk);
+      });
+      svg.appendChild(df);
+      conns.forEach(function (c) {
+        var fe = document.getElementById(c.f), te = document.getElementById(c.t);
+        if (!fe || !te) return;
+        var p1 = pos(fe, ch, c.fs || 'r'), p2 = pos(te, ch, c.ts || 'l');
+        var col = C[c.c] || '#888', da = c.d ? '5,4' : 'none', pt = c.pt || c.c;
+        // glow
+        var g = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        g.setAttribute('d', bez(p1.x, p1.y, p2.x, p2.y, pt));
+        g.setAttribute('fill', 'none'); g.setAttribute('stroke', col);
+        g.setAttribute('stroke-width', '3.5'); g.setAttribute('stroke-opacity', '.1');
+        g.setAttribute('stroke-dasharray', da); svg.appendChild(g);
+        // line
+        var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', bez(p1.x, p1.y, p2.x, p2.y, pt));
+        p.setAttribute('fill', 'none'); p.setAttribute('stroke', col);
+        p.setAttribute('stroke-width', '1.3'); p.setAttribute('stroke-opacity', '.65');
+        p.setAttribute('stroke-dasharray', da);
+        if (c.a !== false) p.setAttribute('marker-end', 'url(#a-' + c.c + ')');
+        svg.appendChild(p);
+      });
+    }
+
+    // AUTONOMOUS — corrected connections
+    var AC = [
+      // KEY: L1 cnf.jwk → L2 alg (user key signs L2)
+      { f: 'a1cnf', t: 'a2alg', c: 'key', fs: 'r', ts: 'l' },
+      // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
+      { f: 'a1hash', t: 'a2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // KEY: L2 payment cnf.jwk → L3a alg (agent key signs L3a)
+      { f: 'a2pjwk', t: 'a3aalg', c: 'key', fs: 'r', ts: 'l' },
+      // KEY: L2 checkout cnf.jwk → L3b alg (agent key signs L3b)
+      { f: 'a2cjwk', t: 'a3balg', c: 'key', fs: 'r', ts: 'l' },
+      // KID: L2 payment cnf.kid → L3a kid (verifier matches kid values)
+      { f: 'a2pkid', t: 'a3akid', c: 'kid', fs: 'r', ts: 'l' },
+      // KID: L2 checkout cnf.kid → L3b kid (verifier matches kid values)
+      { f: 'a2ckid', t: 'a3bkid', c: 'kid', fs: 'r', ts: 'l' },
+      // HASH: L2 (whole+discl) → L3a sd_hash (L3a hashes L2 + payment + merchant disclosures)
+      { f: 'a2hash', t: 'a3ash', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // HASH: L2 (whole+discl) → L3b sd_hash (L3b hashes L2 + checkout + item disclosures)
+      { f: 'a2hash', t: 'a3bsh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // XREF: L3a transaction_id ↔ L3b checkout_hash (equality, no arrowhead)
+      { f: 'a3atx', t: 'a3bch', c: 'xref', fs: 'l', ts: 'l', a: false, d: 1 }
+    ];
+
+    // IMMEDIATE — corrected connections
+    var IC = [
+      // KEY: L1 cnf.jwk → L2 alg (user key signs L2)
+      { f: 'i1cnf', t: 'i2alg', c: 'key', fs: 'r', ts: 'l' },
+      // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
+      { f: 'i1hash', t: 'i2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // XREF: L2 checkout_hash ↔ L2 transaction_id (equality within same card)
+      { f: 'i2ck', t: 'i2tx', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' }
+    ];
+
+    function drawAll() {
+      var on = document.getElementById('showL').checked;
+      document.getElementById('svgA').style.display = on ? '' : 'none';
+      document.getElementById('svgI').style.display = on ? '' : 'none';
+      var aa = document.querySelectorAll('.la');
+      for (var i = 0; i < aa.length; i++) aa[i].style.display = on ? '' : 'none';
+      if (!on) return;
+      if (document.getElementById('cA').style.display !== 'none') draw('svgA', 'chA', AC);
+      if (document.getElementById('cI').style.display !== 'none') draw('svgI', 'chI', IC);
+    }
+
+    var btns = document.querySelectorAll('#mTog button');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        btns.forEach(function (x) { x.classList.remove('on') }); b.classList.add('on');
+        var m = b.dataset.m;
+        document.getElementById('cA').style.display = m === 'auto' ? 'block' : 'none';
+        document.getElementById('cI').style.display = m === 'imm' ? 'block' : 'none';
+        document.getElementById('sA').style.display = m === 'auto' ? 'block' : 'none';
+        document.getElementById('sI').style.display = m === 'imm' ? 'block' : 'none';
+        requestAnimationFrame(function () { requestAnimationFrame(drawAll) });
+      })
+    });
+    document.getElementById('showL').addEventListener('change', drawAll);
+    window.addEventListener('load', function () { requestAnimationFrame(drawAll) });
+    window.addEventListener('resize', function () { requestAnimationFrame(drawAll) });
+    document.getElementById('cA').addEventListener('scroll', drawAll);
+    document.getElementById('cI').addEventListener('scroll', drawAll);
+  </script>
+</body>
+
+</html>
