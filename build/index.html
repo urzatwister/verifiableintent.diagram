@@ -845,12 +845,12 @@
 <body>
 
   <div class="hdr">
-    <div class="tag">Verifiable Intent v0.2 · Credential Anatomy</div>
+    <div class="tag">Verifiable Intent · Credential Anatomy</div>
     <h1>Delegation Chain — Field-Level Bindings</h1>
     <p>Each layer cryptographically binds the next via <code
         style="background:var(--card);padding:1px 4px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--l2)">cnf.jwk</code>
       (RFC 7800). Selective disclosure per RFC 9901.</p>
-    <div class="by">Diagram Drawn by CY Tan</div>
+    <div class="by">V0.3 Diagram Drawn by CY Tan</div>
   </div>
 
   <div class="ctrl">
@@ -875,6 +875,9 @@
     <div class="r"><span class="c2">L2</span> signed by <span class="w">User</span> (L1 cnf) · <span
         class="v">sd_hash</span>→L1 · <span class="s">mandate cnf.jwk</span> = Agent Key · typ: <span
         class="w">kb-sd-jwt+kb</span> · 24h–30d</div>
+    <div class="r"><span style="color:var(--cx)">L2↔</span> <span class="w">payment.reference</span> · <span
+        class="v">conditional_transaction_id</span> = hash(checkout disclosure) · pre-commits payment → checkout at
+      mandate creation</div>
     <div class="r"><span class="c3">L3</span> signed by <span class="w">Agent</span> (L2 cnf) · <span
         class="v">sd_hash</span>→L2+discl · header <span class="v">kid</span>=L2 <span class="s">cnf.kid</span> · typ:
       <span class="w">kb-sd-jwt</span> · ~5min
@@ -1120,7 +1123,8 @@
             </div>
           </div>
         </div>
-        <div class="f s fo">
+        <div class="f s fo" id="a2pconstr">
+          <span class="la ri ax"></span>
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">constraints[]</span><span class="rq r">REQ</span><span
               class="fo-chv">▶</span><span class="fd">Typed constraint array. Click ▶ to expand all constraint
@@ -1144,7 +1148,7 @@
                 payee URL</div>
               <div class="sfg">payment.reference</div>
               <div class="sf"><span class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
-                B64U(SHA-256(checkout disclosure))</div>
+                B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
               <div class="sfg">payment.budget</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
               <div class="sf"><span class="sfn">max</span> <span class="sfr r">REQ</span> cumulative spending limit
@@ -1167,7 +1171,8 @@
           </div>
         </div>
 
-        <div class="fg">Checkout Mandate (SD → merchant)</div>
+        <div class="fg" id="a2cvct" style="position:relative"><span class="la le ax"></span>Checkout Mandate (SD →
+          merchant)</div>
         <div class="f s">
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.open"</span><span
@@ -1216,6 +1221,14 @@
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">prompt_summary</span><span class="rq o">OPT</span><span
               class="fd">Human-readable intent description. For audit trail.</span></div>
+        </div>
+
+        <div class="xr" style="border-color:var(--l2b);max-width:100%;margin-top:6px">
+          <span class="xh" style="color:var(--l2)">Payment.Reference binding (constraint):</span>
+          payment <span class="xv">conditional_transaction_id</span>
+          = B64U(SHA-256(checkout mandate disclosure))<br>
+          Pre-commits payment to this specific checkout mandate before agent executes.
+          Verifier checks equality when both disclosures are presented.
         </div>
 
         <!-- Hash source anchor — represents "whole L2 + disclosures" for L3 sd_hash -->
@@ -1755,7 +1768,7 @@
 
   <script>
     /*
-      ARROW AUDIT — correct field-to-field mappings per spec §3.2:
+      ARROW AUDIT — correct field-to-field mappings per spec 3.2:
     
       KEY BINDING (cyan solid): cnf.jwk → next layer's alg (signed by that key)
         L1 cnf.jwk            → L2 alg
@@ -1855,7 +1868,9 @@
       // HASH: L2 (whole+discl) → L3b sd_hash (L3b hashes L2 + checkout + item disclosures)
       { f: 'a2hash', t: 'a3bsh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
       // XREF: L3a transaction_id ↔ L3b checkout_hash (equality, no arrowhead)
-      { f: 'a3atx', t: 'a3bch', c: 'xref', fs: 'l', ts: 'l', a: false, d: 1 }
+      { f: 'a3atx', t: 'a3bch', c: 'xref', fs: 'l', ts: 'l', a: false, d: 1 },
+      // XREF: L2 payment.reference conditional_transaction_id → L2 checkout mandate (intra-card pre-commitment)
+      { f: 'a2pconstr', t: 'a2cvct', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' }
     ];
 
     // IMMEDIATE — corrected connections
