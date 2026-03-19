@@ -870,8 +870,8 @@
 
   <div class="sum" id="sA">
     <div class="t">Signature &amp; Binding Summary · Autonomous (L1 + L2 + L3)</div>
-    <div class="r"><span class="c1">L1</span> signed by <span class="w">Credential Provider</span> · <span
-        class="v">cnf.jwk</span> = User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
+    <div class="r"><span class="c1">L1</span> signed by <span class="w">Issuer</span> · <span class="v">cnf.jwk</span> =
+      User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
     <div class="r"><span class="c2">L2</span> signed by <span class="w">User</span> (L1 cnf) · <span
         class="v">sd_hash</span>→L1 · <span class="s">mandate cnf.jwk</span> = Agent Key · typ: <span
         class="w">kb-sd-jwt+kb</span> · 24h–30d</div>
@@ -885,8 +885,8 @@
   </div>
   <div class="sum" id="sI" style="display:none">
     <div class="t">Signature &amp; Binding Summary · Immediate (L1 + L2)</div>
-    <div class="r"><span class="c1">L1</span> signed by <span class="w">Credential Provider</span> · <span
-        class="v">cnf.jwk</span> = User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
+    <div class="r"><span class="c1">L1</span> signed by <span class="w">Issuer</span> · <span class="v">cnf.jwk</span> =
+      User Key · typ: <span class="w">sd+jwt</span> · ~1yr</div>
     <div class="r"><span class="c2">L2</span> signed by <span class="w">User</span> (L1 cnf) · <span
         class="v">sd_hash</span>→L1 · <span class="w">no cnf</span> — terminal · typ: <span class="w">kb-sd-jwt</span> ·
       ~15min</div>
@@ -917,15 +917,15 @@
 
       <!-- ── L1 ── -->
       <div class="lc l1">
-        <div class="bdg l1">Layer 1 · Credential Provider</div>
+        <div class="bdg l1">Layer 1 · Issuer</div>
         <div class="lt">
           <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
         </div>
-        <div class="ld">Root SD-JWT. Signed by Credential Provider. Binds user's public key. ~1 year.</div>
+        <div class="ld">Root SD-JWT. Signed by Issuer. Binds user's public key. ~1 year.</div>
 
         <div class="sig l1">
           <div class="sig-t l1">✦ Signature</div>
-          <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Credential Provider</span></div>
+          <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Issuer</span></div>
           <div class="sig-r"><span class="sk">key:</span> <span class="sv">Issuer private key · resolved via JWKS (kid
               in header)</span></div>
         </div>
@@ -945,7 +945,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">kid</span> <span class="fv">= issuer key id</span><span
-              class="rq r">REQ</span><span class="fd">Credential Provider's key id. Resolved via published JWKS.</span>
+              class="rq r">REQ</span><span class="fd">Issuer's key id. Resolved via published JWKS.</span>
           </div>
         </div>
 
@@ -953,7 +953,8 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">iss</span> <span class="fv">= issuer URI</span><span
-              class="rq r">REQ</span><span class="fd">Credential Provider URI. Trust root for the chain.</span></div>
+              class="rq r">REQ</span><span class="fd">Issuer identifier URI. Identifies the financial institution or
+              payment network that signed the L1. MUST be a stable, dereferenceable URI.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1517,7 +1518,7 @@
 
       <!-- ── L1 (Immediate) ── -->
       <div class="lc l1">
-        <div class="bdg l1">Layer 1 · Credential Provider</div>
+        <div class="bdg l1">Layer 1 · Issuer</div>
         <div class="lt">
           <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
         </div>
@@ -1525,7 +1526,7 @@
 
         <div class="sig l1">
           <div class="sig-t l1">✦ Signature</div>
-          <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Credential Provider</span></div>
+          <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Issuer</span></div>
           <div class="sig-r"><span class="sk">key:</span> <span class="sv">Issuer private key · resolved via JWKS (kid
               in header)</span></div>
         </div>
@@ -1544,13 +1545,13 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">kid</span> <span class="fv">= issuer key id</span><span
-              class="rq r">REQ</span><span class="fd">Credential Provider key id.</span></div>
+              class="rq r">REQ</span><span class="fd">Issuer key id.</span></div>
         </div>
         <div class="fg">Payload</div>
         <div class="f v">
           <div class="dt dtv"></div>
-          <div class="fc"><span class="fn">iss</span> <span class="fv">= issuer URI</span><span
-              class="rq r">REQ</span><span class="fd">Credential Provider URI.</span></div>
+          <div class="fc"><span class="fn">iss</span> <span class="fv">= Issuer URI</span><span
+              class="rq r">REQ</span><span class="fd">Issuer URI.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
