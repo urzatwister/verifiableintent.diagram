@@ -636,6 +636,51 @@
       color: var(--vi)
     }
 
+    /* ── Cart JWT Panel ── */
+    .cjwt-panel {
+      display: none;
+      flex-shrink: 0;
+      align-items: flex-start;
+    }
+    .cjwt-panel.open {
+      display: flex;
+    }
+    .cjwt-panel .lc {
+      min-width: 280px;
+      max-width: 320px;
+    }
+    .cjwt-ab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 4px;
+      width: 44px;
+      flex-shrink: 0;
+    }
+    .cjwt-trigger {
+      cursor: pointer;
+      user-select: none;
+    }
+    .cjwt-trigger:hover {
+      filter: brightness(1.13);
+    }
+    .cjwt-trigger .fo-chv {
+      display: inline-block;
+      font-size: 8px;
+      color: var(--muted);
+      transition: transform .15s;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .cjwt-trigger.active .fn {
+      color: #c4a35a;
+    }
+    .cjwt-trigger.active .fo-chv {
+      transform: rotate(90deg);
+      color: #c4a35a;
+    }
+
     /* ── Expandable object fields ── */
     .fo {
       cursor: pointer;
@@ -1504,9 +1549,9 @@
                 class="rq r">REQ</span><span class="fd">Final checkout type (no ".open"). Concrete selections.</span>
             </div>
           </div>
-          <div class="f s">
+          <div class="f s cjwt-trigger" id="a3bCjwt">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span
+            <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span
                 class="fd">Merchant-signed cart JWT: items, qty, prices, currency, merchant id.</span></div>
           </div>
           <div class="f s" id="a3bch">
@@ -1541,6 +1586,57 @@
         <div class="xr"><span class="xh">Cross-reference :</span> L3a.<span class="xv">transaction_id</span> ==
           L3b.<span class="xv">checkout_hash</span><br>Both = B64U(SHA-256(checkout_jwt)). Binds payment + checkout to
           same transaction.</div>
+      </div>
+
+      <!-- ── Cart JWT Panel (autonomous) ── -->
+      <div class="cjwt-panel" id="cjwtA">
+        <div class="cjwt-ab">
+          <div class="als" style="margin-bottom:4px">
+            <div class="alb" style="color:#c4a35a;border-color:rgba(180,150,90,.3)">checkout_jwt ▶</div>
+          </div>
+          <div class="al">
+            <div class="as" style="background:#c4a35a;opacity:.4"></div>
+            <div class="as" style="background:#c4a35a;opacity:.4"></div>
+            <div class="arh" style="border-left-color:#c4a35a"></div>
+          </div>
+        </div>
+        <div class="lc" style="background:rgba(180,150,90,.06);border:1.5px solid rgba(180,150,90,.28);margin-top:4px">
+          <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Cart JWT</div>
+          <div class="lt"><h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span></div>
+          <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
+          <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
+            <div class="sig-t" style="color:#c4a35a">✦ Signature</div>
+            <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Merchant</span></div>
+            <div class="sig-r"><span class="sk">key:</span> <span class="sv">Merchant private key · public key discoverable via published JWKS endpoint</span></div>
+          </div>
+          <div class="fg" style="color:#c4a35a;opacity:.85">Header</div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">typ</span> <span class="fv">= "JWT"</span><span class="rq r">REQ</span><span class="fd">Standard JWT (no selective disclosure).</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">kid</span> <span class="fv">= "merchant-key-1"</span><span class="rq r">REQ</span><span class="fd">Merchant key id. Resolved via merchant's published JWKS.</span></div></div>
+          <div class="fg" style="color:#c4a35a;opacity:.85">Payload</div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">iss</span> <span class="fv">= "https://tennis-warehouse.com"</span><span class="rq r">REQ</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">sub</span> <span class="fv">= "cart_checkout"</span><span class="rq r">REQ</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at timestamp.</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration (~1 hr).</span></div></div>
+          <div class="f v fo">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">cart</span><span class="fo-chv">▶</span><span class="fd">Cart contents.</span>
+              <div class="fo-body">
+                <div class="sfg">items[]</div>
+                <div class="sfg" style="opacity:1;margin-left:8px">item[0]</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">sku</span> = "BAB86345"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">name</span> = "Babolat Pure Aero Tennis Racket"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">size</span> = 3 &nbsp;·&nbsp; <span class="sfn">size_label</span> = "4 3/8"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">color</span> = "white"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">quantity</span> = 1</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">unitPrice</span> = 279.99</div>
+                <div class="sfg">subTotal</div>
+                <div class="sf" style="padding-left:8px"><span class="sfn">amount</span> = 279.99</div>
+                <div class="sf" style="padding-left:8px"><span class="sfn">currencyCode</span> = "USD"</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1741,10 +1837,9 @@
           <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout"</span><span
               class="rq r">REQ</span><span class="fd">Final checkout. Completed cart, not constraints.</span></div>
         </div>
-        <div class="f s">
+        <div class="f s cjwt-trigger" id="i2Cjwt">
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span class="fd">Cart JWT:
-              items, qty, prices, currency, merchant.</span></div>
+          <div class="fc"><span class="fn">checkout_jwt</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span class="fd">Merchant-signed cart JWT: items, qty, prices, currency, merchant id.</span></div>
         </div>
         <div class="f s" id="i2ck">
           <span class="la ri ax"></span>
@@ -1803,6 +1898,57 @@
 
         <div class="nb l2">No cnf in mandates — terminal. Values are final. User's signature = authorization. Agent
           forwards only.</div>
+      </div>
+
+      <!-- ── Cart JWT Panel (immediate) ── -->
+      <div class="cjwt-panel" id="cjwtI">
+        <div class="cjwt-ab">
+          <div class="als" style="margin-bottom:4px">
+            <div class="alb" style="color:#c4a35a;border-color:rgba(180,150,90,.3)">checkout_jwt ▶</div>
+          </div>
+          <div class="al">
+            <div class="as" style="background:#c4a35a;opacity:.4"></div>
+            <div class="as" style="background:#c4a35a;opacity:.4"></div>
+            <div class="arh" style="border-left-color:#c4a35a"></div>
+          </div>
+        </div>
+        <div class="lc" style="background:rgba(180,150,90,.06);border:1.5px solid rgba(180,150,90,.28);margin-top:4px">
+          <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Cart JWT</div>
+          <div class="lt"><h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span></div>
+          <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
+          <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
+            <div class="sig-t" style="color:#c4a35a">✦ Signature</div>
+            <div class="sig-r"><span class="sk">signer:</span> <span class="sv">Merchant</span></div>
+            <div class="sig-r"><span class="sk">key:</span> <span class="sv">Merchant private key · public key discoverable via published JWKS endpoint</span></div>
+          </div>
+          <div class="fg" style="color:#c4a35a;opacity:.85">Header</div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">typ</span> <span class="fv">= "JWT"</span><span class="rq r">REQ</span><span class="fd">Standard JWT (no selective disclosure).</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">kid</span> <span class="fv">= "merchant-key-1"</span><span class="rq r">REQ</span><span class="fd">Merchant key id. Resolved via merchant's published JWKS.</span></div></div>
+          <div class="fg" style="color:#c4a35a;opacity:.85">Payload</div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">iss</span> <span class="fv">= "https://tennis-warehouse.com"</span><span class="rq r">REQ</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">sub</span> <span class="fv">= "cart_checkout"</span><span class="rq r">REQ</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">iat</span><span class="rq r">REQ</span><span class="fd">Issued-at timestamp.</span></div></div>
+          <div class="f v"><div class="dt dtv"></div><div class="fc"><span class="fn">exp</span><span class="rq r">REQ</span><span class="fd">Expiration (~1 hr).</span></div></div>
+          <div class="f v fo">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">cart</span><span class="fo-chv">▶</span><span class="fd">Cart contents.</span>
+              <div class="fo-body">
+                <div class="sfg">items[]</div>
+                <div class="sfg" style="opacity:1;margin-left:8px">item[0]</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">sku</span> = "BAB86345"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">name</span> = "Babolat Pure Aero Tennis Racket"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">size</span> = 3 &nbsp;·&nbsp; <span class="sfn">size_label</span> = "4 3/8"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">color</span> = "white"</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">quantity</span> = 1</div>
+                <div class="sf" style="padding-left:16px"><span class="sfn">unitPrice</span> = 279.99</div>
+                <div class="sfg">subTotal</div>
+                <div class="sf" style="padding-left:8px"><span class="sfn">amount</span> = 279.99</div>
+                <div class="sf" style="padding-left:8px"><span class="sfn">currencyCode</span> = "USD"</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- No L3 -->
@@ -1971,6 +2117,26 @@
       el.addEventListener('click', function (e) {
         e.stopPropagation();
         el.classList.toggle('open');
+        requestAnimationFrame(function () { requestAnimationFrame(drawAll); });
+      });
+    });
+
+    // checkout_jwt → merchant JWT panel
+    [['a3bCjwt', 'cjwtA'], ['i2Cjwt', 'cjwtI']].forEach(function (pair) {
+      var trigger = document.getElementById(pair[0]);
+      var panel = document.getElementById(pair[1]);
+      if (!trigger || !panel) return;
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = panel.classList.toggle('open');
+        trigger.classList.toggle('active', open);
+        if (open) {
+          var chn = panel.parentElement;
+          var offset = trigger.getBoundingClientRect().top - chn.getBoundingClientRect().top + chn.scrollTop;
+          panel.style.paddingTop = Math.max(0, offset - 4) + 'px';
+        } else {
+          panel.style.paddingTop = '';
+        }
         requestAnimationFrame(function () { requestAnimationFrame(drawAll); });
       });
     });
