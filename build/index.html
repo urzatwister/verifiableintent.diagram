@@ -934,7 +934,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
+              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -960,6 +960,12 @@
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">sub</span> <span class="fv">= user id</span><span
               class="rq r">REQ</span><span class="fd">End-user subject identifier.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">aud</span> <span class="fv">= verifier URI</span><span
+              class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier. eg. Credential
+              Provider</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1044,7 +1050,8 @@
           <span class="la le ak"></span>
           <div class="sig-t l2">✦ Signature</div>
           <div class="sig-r"><span class="sk">signer:</span> <span class="sv">User</span></div>
-          <div class="sig-r"><span class="sk">key:</span> <span class="sv">User private key (matches L1 cnf.jwk)</span>
+          <div class="sig-r"><span class="sk">key:</span> <span class="sv">User private key (matches public key from L1
+              cnf.jwk)</span>
           </div>
         </div>
 
@@ -1052,8 +1059,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">Signed by user's private key (from L1 cnf.jwk). Proves user
-              created L2.</span></div>
+              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1071,7 +1077,8 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">aud</span> <span class="fv">Audience URI</span><span
-              class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier.</span>
+              class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier. eg.
+              Agent</span>
           </div>
         </div>
         <div class="f v">
@@ -1165,13 +1172,6 @@
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
               <div class="sf"><span class="sfn">max</span> <span class="sfr r">REQ</span> cumulative spending limit
                 (minor units)</div>
-              <div class="sfg">payment.recurrence</div>
-              <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>
-                DAILY|WEEKLY|BIWEEKLY|MONTHLY|QUARTERLY|ANNUALLY</div>
-              <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601 (YYYY-MM-DD)
-              </div>
-              <div class="sf"><span class="sfn">end_date</span> <span class="sfr rc">REC</span> ISO 8601</div>
-              <div class="sf"><span class="sfn">number</span> <span class="sfr rc">REC</span> max recurrence count</div>
               <div class="sfg">payment.agent_recurrence</div>
               <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>
                 ON_DEMAND|DAILY|WEEKLY|BIWEEKLY|MONTHLY|...</div>
@@ -1289,7 +1289,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Signed by agent's private key (from L2 payment cnf.jwk).</span>
+                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span>
             </div>
           </div>
           <div class="f v">
@@ -1302,7 +1302,7 @@
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
                 class="rq r">REQ</span><span class="fd">Matches L2 payment cnf.kid. Verifier resolves key from L2
-                cnf.jwk. MUST NOT include jwk header.</span></div>
+                cnf.jwk.</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -1406,6 +1406,18 @@
               </div>
             </div>
           </div>
+          <div class="f s fo">
+            <div class="dt dts"></div>
+            <div class="fc"><span class="fn">payment_recurrence</span><span class="rq o">OPT</span><span
+                class="fo-chv">▶</span><span class="fd">Recurrence schedule for repeated execution. From L2 constraints.</span>
+              <div class="fo-body">
+                <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span> DAILY|WEEKLY|BIWEEKLY|MONTHLY|QUARTERLY|ANNUALLY</div>
+                <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601 (YYYY-MM-DD)</div>
+                <div class="sf"><span class="sfn">end_date</span> <span class="sfr r">REQ</span> ISO 8601</div>
+                <div class="sf"><span class="sfn">number</span> <span class="sfr o">OPT</span> max recurrence count</div>
+              </div>
+            </div>
+          </div>
 
           <div class="nb l3">No cnf in payload — terminal. Checkout details NOT visible to network.</div>
         </div>
@@ -1430,7 +1442,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Signed by agent's private key (from L2 checkout cnf.jwk).</span>
+                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span>
             </div>
           </div>
           <div class="f v">
@@ -1443,7 +1455,7 @@
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
                 class="rq r">REQ</span><span class="fd">Matches L2 checkout cnf.kid. Verifier resolves key from L2
-                cnf.jwk. MUST NOT include jwk.</span></div>
+                cnf.jwk.</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -1558,7 +1570,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">ECDSA P-256 + SHA-256.</span></div>
+              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1580,6 +1592,12 @@
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">sub</span> <span class="fv">= user id</span><span
               class="rq r">REQ</span><span class="fd">End-user identifier.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">aud</span> <span class="fv">= verifier URI</span><span
+              class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier. eg. Credential
+              Provider</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1660,7 +1678,8 @@
           <span class="la le ak"></span>
           <div class="sig-t l2">✦ Signature</div>
           <div class="sig-r"><span class="sk">signer:</span> <span class="sv">User</span></div>
-          <div class="sig-r"><span class="sk">key:</span> <span class="sv">User private key (matches L1 cnf.jwk)</span>
+          <div class="sig-r"><span class="sk">key:</span> <span class="sv">User private key (matches public key from L1
+              cnf.jwk)</span>
           </div>
         </div>
 
@@ -1668,8 +1687,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">Signed by user's key from L1 cnf.jwk. Signature =
-              authorization.</span></div>
+              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
