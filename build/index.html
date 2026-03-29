@@ -999,7 +999,12 @@
           <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Additional card
               id. Multi-card disambiguation.</span></div>
         </div>
-
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+              class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+              "sha-256".</span></div>
+        </div>
         <div class="fg">Selectively Disclosable</div>
         <div class="f s">
           <div class="dt dts"></div>
@@ -1065,8 +1070,8 @@
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
-          <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
-              class="rq r">REQ</span><span class="fd">Audience — payment network. Prevents cross-context replay.</span>
+          <div class="fc"><span class="fn">aud</span> <span class="fv">Audience URI</span><span
+              class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier.</span>
           </div>
         </div>
         <div class="f v">
@@ -1085,6 +1090,12 @@
           <div class="fc"><span class="fn">sd_hash</span> <span class="fv">= hash(L1)</span><span
               class="rq r">REQ</span><span class="fd">= B64U(SHA-256(ASCII(serialized_L1))). Binds L2 → entire
               L1.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+              class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+              "sha-256".</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1323,6 +1334,12 @@
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+                "sha-256".</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
             <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">SD-JWT
                 disclosure refs for payment mandate fields.</span></div>
           </div>
@@ -1455,6 +1472,12 @@
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">sd_hash</span><span class="rq r">REQ</span><span class="fd">= hash(L2 base
                 JWT + checkout discl. + item discl.). NOT payment disclosures.</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+                "sha-256".</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1594,6 +1617,12 @@
           <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Multi-card
               disambiguation.</span></div>
         </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+              class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+              "sha-256".</span></div>
+        </div>
         <div class="fg">Selectively Disclosable</div>
         <div class="f s">
           <div class="dt dts"></div>
@@ -1675,6 +1704,12 @@
           <div class="fc"><span class="fn">sd_hash</span> <span class="fv">= hash(L1)</span><span
               class="rq r">REQ</span><span class="fd">= B64U(SHA-256(ASCII(serialized_L1))). Binds L2 → entire
               L1.</span></div>
+        </div>
+        <div class="f v">
+          <div class="dt dtv"></div>
+          <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
+              class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
+              "sha-256".</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
