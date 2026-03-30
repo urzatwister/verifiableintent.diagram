@@ -636,31 +636,58 @@
       color: var(--vi)
     }
 
-    /* ── Cart JWT Panel (overlay) ── */
+    /* ── Checkout JWT Panel ── */
+    /* Desktop: centered modal with backdrop */
     .cjwt-panel {
       display: none;
       position: fixed;
-      top: 0;
-      right: 0;
-      width: 340px;
+      inset: 0;
       z-index: 300;
-      box-shadow: -4px 0 32px rgba(0,0,0,.65);
+      background: rgba(0,0,0,.6);
+      overflow-y: auto;
+      align-items: center;
+      justify-content: center;
     }
     .cjwt-panel.open {
-      display: block;
+      display: flex;
     }
     .cjwt-panel .lc {
       position: relative;
+      width: 400px;
+      max-width: calc(100vw - 32px);
       min-width: unset;
-      max-width: unset;
-      border-radius: 0;
-      border-top: none !important;
-      border-right: none !important;
-      border-bottom: none !important;
-      border-left: 2px solid rgba(180,150,90,.35) !important;
-      padding-bottom: 16px;
+      background: var(--card) !important;
+      border-radius: 8px !important;
+      border: 1.5px solid rgba(180,150,90,.5) !important;
+      box-shadow: 0 8px 40px rgba(0,0,0,.8);
+      padding: 40px 16px 16px 16px !important;
+      margin: auto;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    /* Mobile: action sheet */
+    @media (max-width: 640px) {
+      .cjwt-panel {
+        align-items: flex-end;
+        overflow-y: hidden;
+      }
+      .cjwt-panel .lc {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 16px 16px 0 0 !important;
+        margin: 0;
+        padding: 40px 16px 16px 16px !important;
+      }
     }
     .cjwt-ab { display: none; }
+    .cjwt-panel .lc .bdg {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      margin-bottom: 12px !important;
+    }
     .cjwt-close {
       position: absolute;
       top: 10px;
@@ -1612,7 +1639,7 @@
 
 
     </div>
-  <!-- ── Cart JWT Panel (autonomous) ── -->
+  <!-- ── Checkout JWT Panel (autonomous) ── -->
   <div class="cjwt-panel" id="cjwtA">
     <div class="cjwt-ab">
       <div class="als" style="margin-bottom:4px">
@@ -1626,7 +1653,7 @@
     </div>
     <div class="lc" style="background:rgba(180,150,90,.06);border:1.5px solid rgba(180,150,90,.28)">
       <button class="cjwt-close" aria-label="Close">✕</button>
-      <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Cart JWT</div>
+      <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Checkout JWT</div>
       <div class="lt"><h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span></div>
       <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
       <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
@@ -1936,7 +1963,7 @@
       </div>
 
     </div>
-  <!-- ── Cart JWT Panel (immediate) ── -->
+  <!-- ── Checkout JWT Panel (immediate) ── -->
   <div class="cjwt-panel" id="cjwtI">
     <div class="cjwt-ab">
       <div class="als" style="margin-bottom:4px">
@@ -1950,7 +1977,7 @@
     </div>
     <div class="lc" style="background:rgba(180,150,90,.06);border:1.5px solid rgba(180,150,90,.28)">
       <button class="cjwt-close" aria-label="Close">✕</button>
-      <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Cart JWT</div>
+      <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Checkout JWT</div>
       <div class="lt"><h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span></div>
       <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
       <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
@@ -2144,7 +2171,7 @@
       });
     });
 
-    // checkout_jwt → Cart JWT overlay panel
+    // checkout_jwt → Checkout JWT overlay panel
     [['a3bCjwt', 'cjwtA'], ['i2Cjwt', 'cjwtI']].forEach(function (pair) {
       var trigger = document.getElementById(pair[0]);
       var panel   = document.getElementById(pair[1]);
@@ -2157,6 +2184,10 @@
         e.stopPropagation();
         var open = panel.classList.toggle('open');
         trigger.classList.toggle('active', open);
+      });
+      // Close when clicking the backdrop (panel itself, outside .lc)
+      panel.addEventListener('click', function (e) {
+        if (e.target === panel) closePanel();
       });
       var closeBtn = panel.querySelector('.cjwt-close');
       if (closeBtn) closeBtn.addEventListener('click', function (e) {
