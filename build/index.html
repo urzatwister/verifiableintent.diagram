@@ -1117,7 +1117,10 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd</span><span class="rq r">REQ</span><span class="fd">Array of SD-JWT
-                disclosure hashes for selectively disclosable claims. eg Emails</span></div>
+                disclosure hashes for selectively disclosable claims. eg Emails</span>
+              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
+                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1134,7 +1137,7 @@
           </div>
         </div>
 
-        <div class="fg">Selectively Disclosable</div>
+        <div class="fg">Email SD</div>
         <div class="f s">
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">email</span><span class="rq o">OPT</span><span class="fd">User email.
@@ -1200,7 +1203,12 @@
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">Array
                 of
-                SD-JWT disclosure hash refs. Points to mandate claims.</span></div>
+                SD-JWT disclosure hash refs. Points to mandate claims.</span>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1298,10 +1306,10 @@
               <div class="sf"><span class="sfn">allowed_payees[]</span> <span class="sfr r">REQ</span> allowed_payees
                 array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline payee objects.</div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
-                  style="color:var(--l2)">Cross-ref :</span> Merchant SD-JWT · <span class="xv">Hash</span></div>
+                  style="color:var(--l2)">Cross-ref :</span> Merchant SD· <span class="xv">Hash</span></div>
               <div class="sfg">payment.reference</div>
-              <div class="sf" id="a2ctx" style="position:relative"><span class="la ri ax"></span><span class="sfn">conditional_transaction_id</span> <span
-                  class="sfr r">REQ</span>
+              <div class="sf" id="a2ctx" style="position:relative"><span class="la ri ax"></span><span
+                  class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
                 B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
               <div class="sfg">payment.budget</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
@@ -1349,7 +1357,7 @@
                 allowed_merchants array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline
                 merchant objects.</div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
-                  style="color:var(--l2)">Cross-ref :</span> Merchant SD-JWT · <span class="xv">Hash</span></div>
+                  style="color:var(--l2)">Cross-ref :</span> Merchant SD · <span class="xv">Hash</span></div>
               <div class="sfg">mandate.checkout.line_items</div>
               <div class="sf"><span class="sfn">items[]</span> <span class="sfr r">REQ</span> min 1 item entry</div>
               <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr r">REQ</span> line
@@ -1359,7 +1367,7 @@
                 "&lt;hash&gt;"}) instead of inline item objects, enabling selective disclosure of individual product
                 authorizations</div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
-                  style="color:var(--l2)">Cross-ref :</span> Acceptable Item SD-JWT · <span class="xv">Hash</span></div>
+                  style="color:var(--l2)">Cross-ref :</span> Acceptable Item · <span class="xv">Hash</span></div>
               <div class="sf" style="padding-left:20px"><span class="sfn">quantity</span> <span class="sfr r">REQ</span>
                 max quantity integer</div>
             </div>
@@ -1388,7 +1396,7 @@
 
         <!-- ── L2 AUTONOMOUS MODE: MERCHANT SD-JWT ── -->
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--l2b);">
-          <div class="fg">Merchant SD-JWT</div>
+          <div class="fg">Merchant SD</div>
           <div class="ld">Selective disclosure credential for merchant attributes in autonomous mode delegation.</div>
 
           <div class="f s" id="a2merch-hash">
@@ -1415,7 +1423,7 @@
 
         <!-- ── L2 AUTONOMOUS MODE: ACCEPTABLE ITEM SD-JWT ── -->
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--l2b);">
-          <div class="fg">Acceptable Item SD-JWT</div>
+          <div class="fg">Acceptable Item SD</div>
           <div class="ld">Selective disclosure credential for product/item attributes in autonomous mode delegation.
           </div>
 
@@ -1494,7 +1502,10 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
-                  class="fd">SD-JWT disclosure hash refs for payment mandate fields.</span></div>
+                  class="fd">SD-JWT disclosure hash refs for payment mandate fields.</span>
+                <div class="xr" style="border-color:var(--l3b);margin-top:3px"><span class="xh"
+                    style="color:var(--l3)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
+              </div>
             </div>
             <div class="f v">
               <div class="dt dtv"></div>
@@ -1662,7 +1673,10 @@
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
                   class="fd">SD-JWT
-                  disclosure hash refs for checkout mandate fields.</span></div>
+                  disclosure hash refs for checkout mandate fields.</span>
+                <div class="xr" style="border-color:var(--l3b);margin-top:3px"><span class="xh"
+                    style="color:var(--l3)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+              </div>
             </div>
             <div class="f v">
               <div class="dt dtv"></div>
@@ -1935,7 +1949,10 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd</span><span class="rq r">REQ</span><span class="fd">Array of SD-JWT
-                disclosure hashes for selectively disclosable claims. eg Emails</span></div>
+                disclosure hashes for selectively disclosable claims. eg Emails</span>
+              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
+                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1952,7 +1969,7 @@
           </div>
         </div>
 
-        <div class="fg">Selectively Disclosable</div>
+        <div class="fg">Email SD</div>
         <div class="f s">
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">email</span><span class="rq o">OPT</span><span class="fd">Identity
@@ -2012,7 +2029,12 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">Array
-                of SD-JWT disclosure hash refs. Points to mandate claims.</span></div>
+                of SD-JWT disclosure hash refs. Points to mandate claims.</span>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
