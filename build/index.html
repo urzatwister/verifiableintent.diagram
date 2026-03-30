@@ -1034,7 +1034,8 @@
         </div>
         <div class="ld">Root SD-JWT. Signed by Issuer. Binds user's public key. ~1 year.</div>
 
-        <div style="position: relative; border-right: 3px solid var(--l1); padding-right: 12px;">
+        <div id="a1border" style="position: relative; border-right: 3px solid var(--l1); padding-right: 12px;"><span
+            class="la ri ah"></span>
           <div class="fg">Header (always visible)</div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1297,8 +1298,11 @@
               <div class="sfg">payment.allowed_payee</div>
               <div class="sf"><span class="sfn">allowed_payees[]</span> <span class="sfr r">REQ</span> allowed_payees
                 array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline payee objects.</div>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Merchant SD-JWT · <span class="xv">Hash</span></div>
               <div class="sfg">payment.reference</div>
-              <div class="sf"><span class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
+              <div class="sf" id="a2ctx"><span class="sfn">conditional_transaction_id</span> <span
+                  class="sfr r">REQ</span>
                 B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
               <div class="sfg">payment.budget</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
@@ -1335,7 +1339,7 @@
           <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fd">Agent's public
               key. Only this key's holder can sign L3b. MUST be identical in both mandates.</span></div>
         </div>
-        <div class="f s fo">
+        <div class="f s fo" id="a2cconstr">
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">constraints[]</span><span class="rq r">REQ</span><span
               class="fo-chv">▶</span><span class="fd">Typed constraint array: allowed_merchant, line_items. Click ▶ to
@@ -1345,6 +1349,8 @@
               <div class="sf"><span class="sfn">allowed_merchants[]</span> <span class="sfr r">REQ</span>
                 allowed_merchants array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline
                 merchant objects.</div>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Merchant SD-JWT · <span class="xv">Hash</span></div>
               <div class="sfg">mandate.checkout.line_items</div>
               <div class="sf"><span class="sfn">items[]</span> <span class="sfr r">REQ</span> min 1 item entry</div>
               <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr r">REQ</span> line
@@ -1353,6 +1359,8 @@
                   class="sfr r">REQ</span> within each line item entry MAY contain disclosure references ({"...":
                 "&lt;hash&gt;"}) instead of inline item objects, enabling selective disclosure of individual product
                 authorizations</div>
+              <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
+                  style="color:var(--l2)">Cross-ref :</span> Acceptable Item SD-JWT · <span class="xv">Hash</span></div>
               <div class="sf" style="padding-left:20px"><span class="sfn">quantity</span> <span class="sfr r">REQ</span>
                 max quantity integer</div>
             </div>
@@ -1381,10 +1389,10 @@
 
         <!-- ── L2 AUTONOMOUS MODE: MERCHANT SD-JWT ── -->
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--l2b);">
-          <div class="fg">Merchant SD-JWT (Autonomous Component)</div>
+          <div class="fg">Merchant SD-JWT</div>
           <div class="ld">Selective disclosure credential for merchant attributes in autonomous mode delegation.</div>
 
-          <div class="f s">
+          <div class="f s" id="a2merch-hash">
             <div class="dt dts"></div>
             <div class="fc"><span class="fn">Hash</span><span class="rq r">REQ</span><span class="fd">Merchant
                 disclosure reference hash</span></div>
@@ -1408,11 +1416,11 @@
 
         <!-- ── L2 AUTONOMOUS MODE: ACCEPTABLE ITEM SD-JWT ── -->
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--l2b);">
-          <div class="fg">Acceptable Item SD-JWT (Autonomous Component)</div>
+          <div class="fg">Acceptable Item SD-JWT</div>
           <div class="ld">Selective disclosure credential for product/item attributes in autonomous mode delegation.
           </div>
 
-          <div class="f s">
+          <div class="f s" id="a2item-hash">
             <div class="dt dts"></div>
             <div class="fc"><span class="fn">Hash</span><span class="rq r">REQ</span><span class="fd">Item disclosure
                 reference hash</span></div>
@@ -1853,7 +1861,8 @@
         </div>
         <div class="ld">Same as Autonomous. Root SD-JWT. ~1 year.</div>
 
-        <div style="position: relative; border-right: 3px solid var(--l1); padding-right: 12px;">
+        <div id="i1border" style="position: relative; border-right: 3px solid var(--l1); padding-right: 12px;"><span
+            class="la ri ah"></span>
           <div class="fg">Header</div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -2265,6 +2274,14 @@
       var y = er.top - ccTop + er.height / 2;  // relative to cc's top = SVG y=0
       return side === 'r' ? { x: er.right - cr.left + sl + 2, y: y } : { x: er.left - cr.left + sl - 2, y: y };
     }
+    function visibleAnchor(el) {
+      var cur = el.parentElement;
+      while (cur) {
+        if (cur.classList.contains('fo') && !cur.classList.contains('open')) return cur;
+        cur = cur.parentElement;
+      }
+      return el;
+    }
     function bez(x1, y1, x2, y2, t) {
       if (t === 'xref') { var m = Math.min(x1, x2) - 26; return 'M' + x1 + ',' + y1 + ' C' + m + ',' + y1 + ' ' + m + ',' + y2 + ' ' + x2 + ',' + y2 }
       if (t === 'xref-int') { var m2 = Math.max(x1, x2) + 26; return 'M' + x1 + ',' + y1 + ' C' + m2 + ',' + y1 + ' ' + m2 + ',' + y2 + ' ' + x2 + ',' + y2 }
@@ -2297,7 +2314,8 @@
       conns.forEach(function (c) {
         var fe = document.getElementById(c.f), te = document.getElementById(c.t);
         if (!fe || !te) return;
-        var p1 = pos(fe, ch, ccTop, c.fs || 'r'), p2 = pos(te, ch, ccTop, c.ts || 'l');
+        var fea = visibleAnchor(fe), tea = visibleAnchor(te);
+        var p1 = pos(fea, ch, ccTop, c.fs || 'r'), p2 = pos(tea, ch, ccTop, c.ts || 'l');
         var col = C[c.c] || '#888', da = c.d ? '5,4' : 'none', pt = c.pt || c.c;
         // glow
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -2321,7 +2339,7 @@
       // KEY: L1 cnf.jwk → L2 signature (user key signs L2)
       { f: 'a1cnf', t: 'a2sig', c: 'key', fs: 'r', ts: 'l' },
       // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
-      { f: 'a1hash', t: 'a2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      { f: 'a1border', t: 'a2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
       // KEY: L2 payment cnf.jwk → L3a signature (agent key signs L3a)
       { f: 'a2pjwk', t: 'a3asig', c: 'key', fs: 'r', ts: 'l' },
       // KEY: L2 checkout cnf.jwk → L3b signature (agent key signs L3b)
@@ -2337,7 +2355,7 @@
       // XREF: L3a transaction_id ↔ L3b checkout_hash (equality, no arrowhead)
       { f: 'a3atx', t: 'a3bch', c: 'xref', fs: 'l', ts: 'l', a: false, d: 1 },
       // XREF: L2 payment.reference conditional_transaction_id → L2 checkout mandate (intra-card pre-commitment)
-      { f: 'a2pconstr', t: 'a2cvct', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' }
+      { f: 'a2ctx', t: 'a2cvct', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' },
     ];
 
     // IMMEDIATE — corrected connections
@@ -2345,7 +2363,7 @@
       // KEY: L1 cnf.jwk → L2 signature (user key signs L2)
       { f: 'i1cnf', t: 'i2sig', c: 'key', fs: 'r', ts: 'l' },
       // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
-      { f: 'i1hash', t: 'i2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      { f: 'i1border', t: 'i2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
       // XREF: L2 checkout_hash ↔ L2 transaction_id (equality within same card)
       { f: 'i2ck', t: 'i2tx', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' }
     ];
