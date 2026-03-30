@@ -1295,14 +1295,8 @@
               <div class="sf"><span class="sfn">max</span> <span class="sfr o">OPT</span> upper bound, integer minor
                 units</div>
               <div class="sfg">payment.allowed_payee</div>
-              <div class="sf"><span class="sfn">allowed_payees[]</span> <span class="sfr r">REQ</span> array of payee
-                objects</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr o">OPT</span> payee
-                identifier</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">name</span> <span class="sfr r">REQ</span>
-                display name</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">website</span> <span class="sfr r">REQ</span>
-                payee URL</div>
+              <div class="sf"><span class="sfn">allowed_payees[]</span> <span class="sfr r">REQ</span> allowed_payees
+                array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline payee objects.</div>
               <div class="sfg">payment.reference</div>
               <div class="sf"><span class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
                 B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
@@ -1348,20 +1342,17 @@
               expand.</span>
             <div class="fo-body">
               <div class="sfg">mandate.checkout.allowed_merchant</div>
-              <div class="sf"><span class="sfn">allowed_merchants[]</span> <span class="sfr r">REQ</span> array of
-                merchant objects</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr o">OPT</span>
-                unique merchant identifier</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">name</span> <span class="sfr r">REQ</span>
-                display name</div>
-              <div class="sf" style="padding-left:20px"><span class="sfn">website</span> <span class="sfr r">REQ</span>
-                merchant URL</div>
+              <div class="sf"><span class="sfn">allowed_merchants[]</span> <span class="sfr r">REQ</span>
+                allowed_merchants array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline
+                merchant objects.</div>
               <div class="sfg">mandate.checkout.line_items</div>
               <div class="sf"><span class="sfn">items[]</span> <span class="sfr r">REQ</span> min 1 item entry</div>
               <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr r">REQ</span> line
                 item identifier</div>
               <div class="sf" style="padding-left:20px"><span class="sfn">acceptable_items[]</span> <span
-                  class="sfr r">REQ</span> [{id (SKU), title}]</div>
+                  class="sfr r">REQ</span> within each line item entry MAY contain disclosure references ({"...":
+                "&lt;hash&gt;"}) instead of inline item objects, enabling selective disclosure of individual product
+                authorizations</div>
               <div class="sf" style="padding-left:20px"><span class="sfn">quantity</span> <span class="sfr r">REQ</span>
                 max quantity integer</div>
             </div>
@@ -1401,8 +1392,7 @@
           <div class="f s">
             <div class="dt dts"></div>
             <div class="fc"><span class="fn">id</span><span class="rq r">REQ</span><span class="fd">Unique merchant
-                identifier. Used for matching in mandate.checkout.allowed_merchant and mandate.payment.allowed_payee
-                constraints.</span></div>
+                identifier.</span></div>
           </div>
           <div class="f s">
             <div class="dt dts"></div>
@@ -1429,9 +1419,9 @@
           </div>
           <div class="f s">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">id</span><span class="rq r">REQ</span><span class="fd">Product identifier
-                (e.g., SKU). Used for matching during validation in mandate.checkout.line_items acceptable_items
-                constraints.</span></div>
+            <div class="fc"><span class="fn">id</span><span class="rq r">REQ</span><span class="fd">Unique product
+                identifier
+                (e.g., SKU). </span></div>
           </div>
           <div class="f s">
             <div class="dt dts"></div>
