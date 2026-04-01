@@ -1312,16 +1312,28 @@
                   class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
                 B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
               <div class="sfg">payment.budget</div>
+              <div class="sf" style="font-style:italic;color:var(--cx)">Used with payment.agent_recurrence to cap total
+                spend.</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
               <div class="sf"><span class="sfn">max</span> <span class="sfr r">REQ</span> cumulative spending limit
                 (minor units)</div>
-              <div class="sfg">payment.recurrence</div>
-              <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>
-                ON_DEMAND|DAILY|WEEKLY|BIWEEKLY|MONTHLY|...</div>
+              <div class="sfg">payment.agent_recurrence</div>
+              <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>ON_DEMAND | DAILY |
+                WEEKLY | BIWEEKLY | MONTHLY | QUARTERLY | ANNUALLY
+              </div>
+              <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601 date (e.g.
+                "2026-03-01"). Agent may not create L3s before this date.</div>
+              <div class="sf"><span class="sfn">end_date</span> <span class="sfr r">REQ</span> ISO 8601 date. Agent may
+                not create L3s after this date.</div>
+              <div class="sf"><span class="sfn">max_occurrences</span> <span class="sfr rc">REC</span> Maximum number of
+                purchases agent may make. When absent, only payment.budget constrains transaction count.</div>
+              <div class="sfg">payment.recurrence (Merchant-Managed Recurring Payments)</div>
+              <div class="sf"><span class="sfn">frequency</span> <span
+                  class="sfr r">REQ</span>DAILY|WEEKLY|BIWEEKLY|MONTHLY|QUARTERLY|ANNUALLY</div>
               <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601</div>
-              <div class="sf"><span class="sfn">end_date</span> <span class="sfr r">REQ</span> ISO 8601</div>
-              <div class="sf"><span class="sfn">max_occurrences</span> <span class="sfr rc">REC</span> max agent
-                purchase count</div>
+              <div class="sf"><span class="sfn">end_date</span> <span class="sfr rc">REC</span> ISO 8601</div>
+              <div class="sf"><span class="sfn">number</span> <span class="sfr rc">REC</span>Maximum number of
+                recurrences</div>
             </div>
           </div>
         </div>
@@ -1367,7 +1379,7 @@
                 "&lt;hash&gt;"}) instead of inline item objects, enabling selective disclosure of individual product
                 authorizations</div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
-                  style="color:var(--l2)">Cross-ref :</span> Acceptable Item · <span class="xv">Hash</span></div>
+                  style="color:var(--l2)">Cross-ref :</span> Acceptable Item SD· <span class="xv">Hash</span></div>
               <div class="sf" style="padding-left:20px"><span class="sfn">quantity</span> <span class="sfr r">REQ</span>
                 max quantity integer</div>
             </div>
