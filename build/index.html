@@ -963,7 +963,7 @@
     <p>Each layer cryptographically binds the next via <code
         style="background:var(--card);padding:1px 4px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--l2)">cnf.jwk</code>
       (RFC 7800). Selective disclosure per RFC 9901.</p>
-    <div class="by">V0.4 Diagram Drawn by CY Tan</div>
+    <div class="by">V0.5 Diagram Drawn by CY Tan</div>
   </div>
 
   <div class="ctrl">
@@ -1065,22 +1065,24 @@
           <div class="fg">Payload (always visible)</div>
           <div class="f v">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">aud</span> <span class="fv">= verifier URI</span><span
-                class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier. eg.
-                Credential
-                Provider</span></div>
-          </div>
-          <div class="f v">
-            <div class="dt dtv"></div>
             <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Additional card
                 id. Multi-card disambiguation.</span></div>
           </div>
-          <div class="f v" id="a1cnf">
+          <div class="f v fo" id="a1cnf">
             <span class="la ri ak"></span>
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">cnf.jwk</span> <span class="fv">= User Pub Key</span><span
-                class="rq r">REQ</span><span class="fd">User's public key (RFC 7800). L2 MUST be signed by matching
-                private key.</span></div>
+                class="rq r">REQ</span><span class="fo-chv">▶</span><span class="fd">User's public key (RFC 7800). L2
+                MUST be signed by matching
+                private key.</span>
+              <div class="fo-body">
+                <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
+                <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
+                <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
+                <div class="sf"><span class="sfn">y</span> <span class="sfr r">REQ</span> y coordinate base64url</div>
+              </div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1119,14 +1121,6 @@
             <div class="fc"><span class="fn">vct</span> <span class="fv">= credential type URI</span><span
                 class="rq r">REQ</span><span class="fd">Credential type profile (e.g. Mastercard card
                 credential).</span>
-            </div>
-          </div>
-          <div class="f v">
-            <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">_sd</span><span class="rq r">REQ</span><span class="fd">Array of SD-JWT
-                disclosure hashes for selectively disclosable claims. eg Emails</span>
-              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
-                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
             </div>
           </div>
           <div class="f v">
@@ -1200,7 +1194,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= user credential key id</span><span
-                class="rq r">REQ</span><span class="fd">User's key id</span></div>
+                class="rq o">OPT</span><span class="fd">User's key id</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -1235,9 +1229,9 @@
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">iss</span> <span class="fv">= Credential Provider URI</span><span
-                class="rq r">REQ</span><span class="fd">URL that identifies the Credential Provider that helped the user
-                to sign the L2.</span></div>
+            <div class="fc"><span class="fn">iss</span> <span class="fv">= Wallet URI</span><span
+                class="rq r">REQ</span><span class="fd">Wallet URI that identifies the wallet used to sign the
+                L2.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1254,8 +1248,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                "sha-256".</span></div>
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                "sha-512".</span></div>
           </div>
 
           <div class="sig l2" id="a2sig" style="margin-top: 12px;">
@@ -1282,11 +1276,20 @@
           <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Same agent key id
               as checkout. L3a header kid MUST match this.</span></div>
         </div>
-        <div class="f s" id="a2pjwk">
+        <div class="f s fo" id="a2pjwk">
           <span class="la ri ak"></span>
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fd">Same agent public
-              key as checkout — MUST be identical</span></div>
+          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span
+              class="fd">Same agent public key as checkout — MUST be identical</span>
+            <div class="fo-body">
+              <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> MUST match checkout mandate
+              </div>
+              <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC"</div>
+              <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256"</div>
+              <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
+              <div class="sf"><span class="sfn">y</span> <span class="sfr r">REQ</span> y coordinate base64url</div>
+            </div>
+          </div>
         </div>
         <div class="f s fo">
           <div class="dt dts"></div>
@@ -1307,29 +1310,37 @@
               class="fo-chv">▶</span><span class="fd">Typed constraint array. Click ▶ to expand all constraint
               sub-fields.</span>
             <div class="fo-body">
-              <div class="sfg">payment.amount</div>
+              <div class="sfg">mandate.payment.amount_range</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217 (e.g. "USD")
               </div>
               <div class="sf"><span class="sfn">min</span> <span class="sfr o">OPT</span> lower bound, integer minor
                 units</div>
-              <div class="sf"><span class="sfn">max</span> <span class="sfr o">OPT</span> upper bound, integer minor
+              <div class="sf"><span class="sfn">max</span> <span class="sfr r">REQ</span> upper bound, integer minor
                 units</div>
-              <div class="sfg">payment.allowed_payee</div>
-              <div class="sf"><span class="sfn">allowed_payees[]</span> <span class="sfr r">REQ</span> allowed_payees
-                array MAY contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline payee objects.</div>
+              <div class="sfg">mandate.payment.allowed_payees</div>
+              <div class="sf"><span class="sfn">allowed[]</span> <span class="sfr r">REQ</span> allowed payees array MAY
+                contain disclosure references ({"...": "&lt;hash&gt;"}) instead of inline payee objects.</div>
+              <div class="sf" style="padding-left:20px"><span class="sfn">id</span> <span class="sfr o">OPT</span> payee
+                identifier</div>
+              <div class="sf" style="padding-left:20px"><span class="sfn">name</span> <span class="sfr r">REQ</span>
+                display name</div>
+              <div class="sf" style="padding-left:20px"><span class="sfn">website</span> <span class="sfr r">REQ</span>
+                payee URL</div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
                   style="color:var(--l2)">Cross-ref :</span> Merchant SD· <span class="xv">Hash</span></div>
-              <div class="sfg">payment.reference</div>
+              <div class="sfg">mandate.payment.reference</div>
               <div class="sf" id="a2ctx" style="position:relative"><span class="la ri ax"></span><span
                   class="sfn">conditional_transaction_id</span> <span class="sfr r">REQ</span>
                 B64U(SHA-256(L2 checkout mandate disclosure string)) — pre-commits payment to a specific checkout</div>
-              <div class="sfg">payment.budget</div>
+              <div class="sfg">mandate.payment.budget</div>
               <div class="sf" style="font-style:italic;color:var(--cx)">Used with payment.agent_recurrence to cap total
                 spend.</div>
               <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217</div>
               <div class="sf"><span class="sfn">max</span> <span class="sfr r">REQ</span> cumulative spending limit
                 (minor units)</div>
-              <div class="sfg">payment.agent_recurrence</div>
+              <div class="sf"><span class="sfn">min</span> <span class="sfr o">OPT</span> cumulative minimum (minor
+                units)</div>
+              <div class="sfg">mandate.payment.agent_recurrence</div>
               <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>ON_DEMAND | DAILY |
                 WEEKLY | BIWEEKLY | MONTHLY | QUARTERLY | ANNUALLY
               </div>
@@ -1339,7 +1350,7 @@
                 not create L3s after this date.</div>
               <div class="sf"><span class="sfn">max_occurrences</span> <span class="sfr rc">REC</span> Maximum number of
                 purchases agent may make. When absent, only payment.budget constrains transaction count.</div>
-              <div class="sfg">payment.recurrence (Merchant-Managed Recurring Payments)</div>
+              <div class="sfg">mandate.payment.recurrence (Merchant-Managed Recurring Payments)</div>
               <div class="sf"><span class="sfn">frequency</span> <span
                   class="sfr r">REQ</span>DAILY|WEEKLY|BIWEEKLY|MONTHLY|QUARTERLY|ANNUALLY</div>
               <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601</div>
@@ -1354,7 +1365,7 @@
           merchant)</div>
         <div class="f s">
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.open"</span><span
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.open.1"</span><span
               class="rq r">REQ</span><span class="fd">Checkout mandate type. ".open" = constraints, not final
               values.</span></div>
         </div>
@@ -1364,11 +1375,21 @@
           <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Agent's key
               identifier. L3b header kid MUST match this value.</span></div>
         </div>
-        <div class="f s" id="a2cjwk">
+        <div class="f s fo" id="a2cjwk">
           <span class="la ri ak"></span>
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fd">Agent's public
-              key. Only this key's holder can sign L3b. MUST be identical in both mandates.</span></div>
+          <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span
+              class="fd">Agent's public key. Only this key's holder can sign L3b. MUST be identical in both
+              mandates.</span>
+            <div class="fo-body">
+              <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> MUST match payment mandate
+              </div>
+              <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC"</div>
+              <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256"</div>
+              <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
+              <div class="sf"><span class="sfn">y</span> <span class="sfr r">REQ</span> y coordinate base64url</div>
+            </div>
+          </div>
         </div>
         <div class="f s fo" id="a2cconstr">
           <div class="dt dts"></div>
@@ -1562,8 +1583,8 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                  class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                  "sha-256".</span></div>
+                  class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                  "sha-512".</span></div>
             </div>
 
             <div class="sig l3" id="a3asig" style="margin-top: 12px;">
@@ -1579,7 +1600,7 @@
           <div class="fg">Payment Mandate (SD → Payment Network)</div>
           <div class="f s">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment"</span><span
+            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment.1"</span><span
                 class="rq r">REQ</span><span class="fd">Final payment type (no ".open"). Concrete values.</span></div>
           </div>
           <div class="f s fo">
@@ -1598,7 +1619,7 @@
           </div>
           <div class="f s fo">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">payment_amount</span><span class="rq r">REQ</span><span
+            <div class="fc"><span class="fn">amount</span><span class="rq r">REQ</span><span
                 class="fo-chv">▶</span><span class="fd">{currency, amount} in minor units. Verified against L2
                 constraints.</span>
               <div class="fo-body">
@@ -1627,34 +1648,6 @@
             <div class="fc"><span class="fn">transaction_id</span><span class="rq r">REQ</span><span class="fd">=
                 B64U(SHA-256(checkout_jwt)). MUST equal L3b checkout_hash.</span></div>
           </div>
-          <div class="f s fo">
-            <div class="dt dts"></div>
-            <div class="fc"><span class="fn">selected_merchant</span><span class="rq o">OPT</span><span
-                class="fo-chv">▶</span><span class="fd">Chosen from L2 allowed_merchant. Nested SD from L2.</span>
-              <div class="fo-body">
-                <div class="sf"><span class="sfn">id</span> <span class="sfr o">OPT</span> merchant identifier</div>
-                <div class="sf"><span class="sfn">name</span> <span class="sfr r">REQ</span> display name</div>
-                <div class="sf"><span class="sfn">website</span> <span class="sfr r">REQ</span> merchant URL</div>
-              </div>
-            </div>
-          </div>
-          <div class="f s fo">
-            <div class="dt dts"></div>
-            <div class="fc"><span class="fn">payment_recurrence</span><span class="rq o">OPT</span><span
-                class="fo-chv">▶</span><span class="fd">Recurrence schedule for repeated execution. From L2
-                constraints.</span>
-              <div class="fo-body">
-                <div class="sf"><span class="sfn">frequency</span> <span class="sfr r">REQ</span>
-                  DAILY|WEEKLY|BIWEEKLY|MONTHLY|QUARTERLY|ANNUALLY</div>
-                <div class="sf"><span class="sfn">start_date</span> <span class="sfr r">REQ</span> ISO 8601 (YYYY-MM-DD)
-                </div>
-                <div class="sf"><span class="sfn">end_date</span> <span class="sfr r">REQ</span> ISO 8601</div>
-                <div class="sf"><span class="sfn">number</span> <span class="sfr o">OPT</span> max recurrence count
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="nb l3">No cnf in payload — terminal. Checkout details NOT visible to network.</div>
         </div>
 
@@ -1733,8 +1726,8 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                  class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                  "sha-256".</span></div>
+                  class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                  "sha-512".</span></div>
             </div>
 
             <div class="sig l3" id="a3bsig" style="margin-top: 12px;">
@@ -1750,7 +1743,7 @@
           <div class="fg">Checkout Mandate (SD → merchant)</div>
           <div class="f s">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout"</span><span
+            <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.1"</span><span
                 class="rq r">REQ</span><span class="fd">Final checkout type (no ".open"). Concrete selections.</span>
             </div>
           </div>
@@ -1765,20 +1758,6 @@
             <div class="dt dts"></div>
             <div class="fc"><span class="fn">checkout_hash</span><span class="rq r">REQ</span><span class="fd">=
                 B64U(SHA-256(checkout_jwt)). MUST equal L3a transaction_id.</span></div>
-          </div>
-          <div class="f s fo">
-            <div class="dt dts"></div>
-            <div class="fc"><span class="fn">line_items</span><span class="rq o">OPT</span><span
-                class="fo-chv">▶</span><span class="fd">Finalized
-                items: SKU, name, qty, price. Satisfies L2 constraints.</span>
-              <div class="fo-body">
-                <div class="sfg">item entry</div>
-                <div class="sf"><span class="sfn">id</span> <span class="sfr r">REQ</span> line item identifier</div>
-                <div class="sf"><span class="sfn">item.id</span> <span class="sfr r">REQ</span> product SKU</div>
-                <div class="sf"><span class="sfn">item.title</span> <span class="sfr r">REQ</span> product name</div>
-                <div class="sf"><span class="sfn">quantity</span> <span class="sfr r">REQ</span> integer count</div>
-              </div>
-            </div>
           </div>
           <div class="f s">
             <div class="dt dts"></div>
@@ -1919,21 +1898,23 @@
           <div class="fg">Payload</div>
           <div class="f v">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">aud</span> <span class="fv">= verifier URI</span><span
-                class="rq r">REQ</span><span class="fd">Intended audience URI. MUST identify the verifier. eg.
-                Credential
-                Provider</span></div>
-          </div>
-          <div class="f v">
-            <div class="dt dtv"></div>
             <div class="fc"><span class="fn">card_id</span><span class="rq o">OPT</span><span class="fd">Multi-card
                 disambiguation.</span></div>
           </div>
-          <div class="f v" id="i1cnf">
+          <div class="f v fo" id="i1cnf">
             <span class="la ri ak"></span>
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">cnf.jwk</span> <span class="fv">= User Pub Key</span><span
-                class="rq r">REQ</span><span class="fd">User's public key. Only they sign L2.</span></div>
+                class="rq r">REQ</span><span class="fo-chv">▶</span><span class="fd">User's public key. Only they sign
+                L2.</span>
+              <div class="fo-body">
+                <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
+                <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
+                <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
+                <div class="sf"><span class="sfn">y</span> <span class="sfr r">REQ</span> y coordinate base64url</div>
+              </div>
+            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1969,14 +1950,6 @@
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">vct</span> <span class="fv">= credential type URI</span><span
                 class="rq r">REQ</span><span class="fd">Payment credential type profile.</span></div>
-          </div>
-          <div class="f v">
-            <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">_sd</span><span class="rq r">REQ</span><span class="fd">Array of SD-JWT
-                disclosure hashes for selectively disclosable claims. eg Emails</span>
-              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
-                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
-            </div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -2046,7 +2019,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= user credential key id</span><span
-                class="rq r">REQ</span><span class="fd">User's key id.</span></div>
+                class="rq o">OPT</span><span class="fd">User's key id.</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -2078,9 +2051,9 @@
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">iss</span> <span class="fv">= Credential Provider URI</span><span
-                class="rq r">REQ</span><span class="fd">URL that identifies the Credential Provider that helped the user
-                to sign the L2.</span></div>
+            <div class="fc"><span class="fn">iss</span> <span class="fv">= Wallet URI</span><span
+                class="rq r">REQ</span><span class="fd">Wallet URI that identifies the wallet used to sign the
+                L2.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -2097,8 +2070,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                "sha-256".</span></div>
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                "sha-512".</span></div>
           </div>
 
           <div class="sig l2" id="i2sig" style="margin-top: 12px;">
@@ -2115,7 +2088,7 @@
         <div class="fg">Checkout Mandate (SD → merchant)</div>
         <div class="f s">
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout"</span><span
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.checkout.1"</span><span
               class="rq r">REQ</span><span class="fd">Final checkout. Completed cart, not constraints.</span></div>
         </div>
         <div class="f s cjwt-trigger" id="i2Cjwt">
@@ -2134,7 +2107,7 @@
         <div class="fg">Payment Mandate (SD → Payment Network)</div>
         <div class="f s">
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment"</span><span
+          <div class="fc"><span class="fn">vct</span> <span class="fv">= "mandate.payment.1"</span><span
               class="rq r">REQ</span><span class="fd">Final payment. Exact values, not constraints.</span></div>
         </div>
         <div class="f s fo">
