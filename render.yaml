@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: verifiableintent-diagram
+    runtime: static
+    staticPublishPath: build
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: "noai, noimageai, noarchive"
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
