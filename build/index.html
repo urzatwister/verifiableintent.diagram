@@ -464,6 +464,12 @@
       border: 1px solid rgba(250, 204, 21, .18)
     }
 
+    .rq.rc {
+      background: rgba(99, 179, 237, .1);
+      color: #63b3ed;
+      border: 1px solid rgba(99, 179, 237, .2)
+    }
+
     .la {
       position: absolute;
       width: 5px;
@@ -978,6 +984,7 @@
       </div>
       <div class="lgi"><span class="rq r">REQ</span> Required</div>
       <div class="lgi"><span class="rq o">OPT</span> Optional</div>
+      <div class="lgi"><span class="rq rc">REC</span> Recommended</div>
     </div>
   </div>
 
@@ -1035,7 +1042,7 @@
 
       <!-- ── L1 ── -->
       <div class="lc l1">
-        <div class="bdg l1">Layer 1 · Issuer → Credential Provider</div>
+        <div class="bdg l1">Layer 1 · Issuer → User</div>
         <div class="lt">
           <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
         </div>
@@ -1047,7 +1054,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+                class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1076,7 +1083,7 @@
                 MUST be signed by matching
                 private key.</span>
               <div class="fo-body">
-                <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf" id="a1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
                 <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
                 <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
                 <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
@@ -1126,8 +1133,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                "sha-256".</span></div>
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                "sha-512".</span></div>
           </div>
 
           <div class="sig l1" style="margin-top: 12px;">
@@ -1172,7 +1179,7 @@
 
       <!-- ── L2 AUTONOMOUS ── -->
       <div class="lc l2">
-        <div class="bdg l2">Layer 2 · User (Credential Provider) → Agent</div>
+        <div class="bdg l2">Layer 2 · User → Agent</div>
         <div class="lt">
           <h2 class="l2">L2 — Intent</h2><span class="ty">typ: "kb-sd-jwt+kb"</span>
         </div>
@@ -1183,7 +1190,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+                class="rq r">REQ</span><span class="fd">Signed by user's private key (from L1 cnf.jwk). Proves user
+                created L2.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1191,10 +1199,14 @@
                 class="rq r">REQ</span><span class="fd">"+kb" enables delegation. Mandates carry cnf binding agent's
                 key.</span></div>
           </div>
-          <div class="f v">
+          <div class="f v" id="a2kid">
+            <span class="la le ad"></span>
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= user credential key id</span><span
-                class="rq o">OPT</span><span class="fd">User's key id</span></div>
+                class="rq o">OPT</span><span class="fd">User's key identifier. Not required by spec (v0.1 omits it) —
+                verifiers resolve the L2 signing key directly from L1 <code
+                  style="background:var(--card);padding:0 2px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--l1)">cnf.jwk</code>.
+                Recommended when multiple user keys may exist.</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -1205,15 +1217,24 @@
                 Agent</span>
             </div>
           </div>
-          <div class="f v">
+          <div class="f v fo">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">Array
+            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
+                class="fo-chv">▶</span><span class="fd">Array
                 of
                 SD-JWT disclosure hash refs. Points to mandate claims.</span>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
                   style="color:var(--l2)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
                   style="color:var(--l2)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+              <div class="fo-body">
+                <div class="sf"><span class="sfn">{"..." : hash-1}</span> <span class="sfr r">REQ</span> Disclosure hash
+                  for payment mandate</div>
+                <div class="sf"><span class="sfn">{"..." : hash-2}</span> <span class="sfr r">REQ</span> Disclosure hash
+                  for checkout mandate</div>
+                <div class="sf" style="font-style:italic;color:var(--cx);padding-top:4px">Each "..." key is the SD-JWT
+                  disclosure hash. One entry per mandate.</div>
+              </div>
             </div>
           </div>
           <div class="f v">
@@ -1230,8 +1251,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">iss</span> <span class="fv">= Wallet URI</span><span
-                class="rq r">REQ</span><span class="fd">Wallet URI that identifies the wallet used to sign the
-                L2.</span></div>
+                class="rq r">REQ</span><span class="fd">Issuer identifier URI (wallet). MUST be a stable,
+                dereferenceable URI.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1270,14 +1291,9 @@
               class="rq r">REQ</span><span class="fd">Payment mandate type. ".open" = constraints for agent to
               fulfill.</span></div>
         </div>
-        <div class="f s" id="a2pkid">
-          <span class="la ri ad"></span>
-          <div class="dt dts"></div>
-          <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Same agent key id
-              as checkout. L3a header kid MUST match this.</span></div>
-        </div>
         <div class="f s fo" id="a2pjwk">
           <span class="la ri ak"></span>
+          <span class="la ri ad" style="top:calc(50% + 6px)"></span>
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span
               class="fd">Same agent public key as checkout — MUST be identical</span>
@@ -1369,14 +1385,9 @@
               class="rq r">REQ</span><span class="fd">Checkout mandate type. ".open" = constraints, not final
               values.</span></div>
         </div>
-        <div class="f s" id="a2ckid">
-          <span class="la ri ad"></span>
-          <div class="dt dts"></div>
-          <div class="fc"><span class="fn">cnf.kid</span><span class="rq r">REQ</span><span class="fd">Agent's key
-              identifier. L3b header kid MUST match this value.</span></div>
-        </div>
         <div class="f s fo" id="a2cjwk">
           <span class="la ri ak"></span>
+          <span class="la ri ad" style="top:calc(50% + 6px)"></span>
           <div class="dt dts"></div>
           <div class="fc"><span class="fn">cnf.jwk</span><span class="rq r">REQ</span><span class="fo-chv">▶</span><span
               class="fd">Agent's public key. Only this key's holder can sign L3b. MUST be identical in both
@@ -1522,7 +1533,7 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                  class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span>
+                  class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span>
               </div>
             </div>
             <div class="f v">
@@ -1535,7 +1546,9 @@
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
                   class="rq r">REQ</span><span class="fd">Matches L2 payment cnf.kid. Verifier resolves key from L2
-                  cnf.jwk.</span></div>
+                  cnf.jwk. MUST NOT include <code
+                    style="background:var(--card);padding:0 2px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--l3)">jwk</code>
+                  header.</span></div>
             </div>
 
             <div class="fg">Payload — always visible</div>
@@ -1544,12 +1557,18 @@
               <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
                   class="rq r">REQ</span><span class="fd">Audience — payment network receiving this.</span></div>
             </div>
-            <div class="f v">
+            <div class="f v fo">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
-                  class="fd">SD-JWT disclosure hash refs for payment mandate fields.</span>
+                  class="fo-chv">▶</span><span class="fd">SD-JWT disclosure hash refs for payment mandate fields.</span>
                 <div class="xr" style="border-color:var(--l3b);margin-top:3px"><span class="xh"
                     style="color:var(--l3)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
+                <div class="fo-body">
+                  <div class="sf"><span class="sfn">{"..." : hash-1}</span> <span class="sfr r">REQ</span> Disclosure
+                    hash for payment mandate</div>
+                  <div class="sf" style="font-style:italic;color:var(--cx);padding-top:4px">One entry — the payment
+                    mandate disclosure hash.</div>
+                </div>
               </div>
             </div>
             <div class="f v">
@@ -1565,7 +1584,8 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">iss</span> <span class="fv">= Agent URI</span><span
-                  class="rq r">REQ</span><span class="fd">URL that identifies the Agent that signed the L3a.</span>
+                  class="rq r">REQ</span><span class="fd">Agent identifier URI. MUST be a stable, dereferenceable
+                  URI.</span>
               </div>
             </div>
             <div class="f v">
@@ -1664,7 +1684,7 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                  class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span>
+                  class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span>
               </div>
             </div>
             <div class="f v">
@@ -1677,7 +1697,9 @@
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">kid</span> <span class="fv">= agent key id</span><span
                   class="rq r">REQ</span><span class="fd">Matches L2 checkout cnf.kid. Verifier resolves key from L2
-                  cnf.jwk.</span></div>
+                  cnf.jwk. MUST NOT include <code
+                    style="background:var(--card);padding:0 2px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--l3)">jwk</code>
+                  header.</span></div>
             </div>
 
             <div class="fg">Payload — always visible</div>
@@ -1686,13 +1708,19 @@
               <div class="fc"><span class="fn">aud</span> <span class="fv">= merchant URI</span><span
                   class="rq r">REQ</span><span class="fd">Audience — merchant receiving this.</span></div>
             </div>
-            <div class="f v">
+            <div class="f v fo">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
-                  class="fd">SD-JWT
+                  class="fo-chv">▶</span><span class="fd">SD-JWT
                   disclosure hash refs for checkout mandate fields.</span>
                 <div class="xr" style="border-color:var(--l3b);margin-top:3px"><span class="xh"
                     style="color:var(--l3)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+                <div class="fo-body">
+                  <div class="sf"><span class="sfn">{"..." : hash-1}</span> <span class="sfr r">REQ</span> Disclosure
+                    hash for checkout mandate</div>
+                  <div class="sf" style="font-style:italic;color:var(--cx);padding-top:4px">One entry — the checkout
+                    mandate disclosure hash.</div>
+                </div>
               </div>
             </div>
             <div class="f v">
@@ -1708,7 +1736,8 @@
             <div class="f v">
               <div class="dt dtv"></div>
               <div class="fc"><span class="fn">iss</span> <span class="fv">= Agent URI</span><span
-                  class="rq r">REQ</span><span class="fd">URL that identifies the Agent that signed the L3b.</span>
+                  class="rq r">REQ</span><span class="fd">Agent identifier URI. MUST be a stable, dereferenceable
+                  URI.</span>
               </div>
             </div>
             <div class="f v">
@@ -1792,7 +1821,8 @@
         <div class="bdg" style="background:rgba(180,150,90,.15);color:#c4a35a;border-color:rgba(180,150,90,.3)">Checkout
           JWT</div>
         <div class="lt">
-          <h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span>
+          <h2 style="color:#c4a35a">Merchant — Cart — Example only. Not determined in the specs</h2><span
+            class="ty">typ: "JWT"</span>
         </div>
         <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
         <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
@@ -1805,7 +1835,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+              class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -1871,7 +1901,7 @@
 
       <!-- ── L1 (Immediate) ── -->
       <div class="lc l1">
-        <div class="bdg l1">Layer 1 · Issuer → Credential Provider</div>
+        <div class="bdg l1">Layer 1 · Issuer → User</div>
         <div class="lt">
           <h2 class="l1">L1 — Identity</h2><span class="ty">typ: "sd+jwt"</span>
         </div>
@@ -1883,7 +1913,7 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+                class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -1908,7 +1938,7 @@
                 class="rq r">REQ</span><span class="fo-chv">▶</span><span class="fd">User's public key. Only they sign
                 L2.</span>
               <div class="fo-body">
-                <div class="sf"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf" id="i1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
                 <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
                 <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
                 <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
@@ -1954,8 +1984,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
-                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. MUST be
-                "sha-256".</span></div>
+                class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
+                "sha-512".</span></div>
           </div>
 
           <div class="sig l1" style="margin-top: 12px;">
@@ -1998,7 +2028,7 @@
 
       <!-- ── L2 IMMEDIATE ── -->
       <div class="lc l2">
-        <div class="bdg l2">Layer 2 · User (Credential Provider) → Verifier</div>
+        <div class="bdg l2">Layer 2 · User → Verifier</div>
         <div class="lt">
           <h2 class="l2">L2 — Intent</h2><span class="ty">typ: "kb-sd-jwt"</span>
         </div>
@@ -2009,17 +2039,22 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-                class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+                class="rq r">REQ</span><span class="fd">Signed by user's key from L1 cnf.jwk. Signature =
+                authorization.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">typ</span> <span class="fv">= "kb-sd-jwt"</span><span
                 class="rq r">REQ</span><span class="fd">No "+kb" — no delegation possible.</span></div>
           </div>
-          <div class="f v">
+          <div class="f v" id="i2kid">
+            <span class="la le ad"></span>
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">kid</span> <span class="fv">= user credential key id</span><span
-                class="rq o">OPT</span><span class="fd">User's key id.</span></div>
+                class="rq o">OPT</span><span class="fd">User's key identifier. Not required by spec (v0.1 omits it) —
+                verifiers resolve the L2 signing key directly from L1 <code
+                  style="background:var(--card);padding:0 2px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--l1)">cnf.jwk</code>.
+                Recommended when multiple user keys may exist.</span></div>
           </div>
 
           <div class="fg">Payload — always visible</div>
@@ -2028,14 +2063,23 @@
             <div class="fc"><span class="fn">aud</span> <span class="fv">= network URI</span><span
                 class="rq r">REQ</span><span class="fd">Audience — payment network.</span></div>
           </div>
-          <div class="f v">
+          <div class="f v fo">
             <div class="dt dtv"></div>
-            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span class="fd">Array
+            <div class="fc"><span class="fn">delegate_payload</span><span class="rq r">REQ</span><span
+                class="fo-chv">▶</span><span class="fd">Array
                 of SD-JWT disclosure hash refs. Points to mandate claims.</span>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
                   style="color:var(--l2)">Cross-ref :</span> Payment Mandate · <span class="xv">Hash</span></div>
               <div class="xr" style="border-color:var(--l2b);margin-top:3px"><span class="xh"
                   style="color:var(--l2)">Cross-ref :</span> Checkout Mandate · <span class="xv">Hash</span></div>
+              <div class="fo-body">
+                <div class="sf"><span class="sfn">{"..." : hash-1}</span> <span class="sfr r">REQ</span> Disclosure hash
+                  for payment mandate</div>
+                <div class="sf"><span class="sfn">{"..." : hash-2}</span> <span class="sfr r">REQ</span> Disclosure hash
+                  for checkout mandate</div>
+                <div class="sf" style="font-style:italic;color:var(--cx);padding-top:4px">Each "..." key is the SD-JWT
+                  disclosure hash. One entry per mandate.</div>
+              </div>
             </div>
           </div>
           <div class="f v">
@@ -2052,8 +2096,8 @@
           <div class="f v">
             <div class="dt dtv"></div>
             <div class="fc"><span class="fn">iss</span> <span class="fv">= Wallet URI</span><span
-                class="rq r">REQ</span><span class="fd">Wallet URI that identifies the wallet used to sign the
-                L2.</span></div>
+                class="rq r">REQ</span><span class="fd">Issuer identifier URI (wallet). MUST be a stable,
+                dereferenceable URI.</span></div>
           </div>
           <div class="f v">
             <div class="dt dtv"></div>
@@ -2193,7 +2237,8 @@
           Checkout
           JWT</div>
         <div class="lt">
-          <h2 style="color:#c4a35a">Merchant — Cart</h2><span class="ty">typ: "JWT"</span>
+          <h2 style="color:#c4a35a">Merchant — Cart — Example only. Not determined in the specs</h2><span
+            class="ty">typ: "JWT"</span>
         </div>
         <div class="ld">Merchant-signed cart JWT. Verifiable by any party via merchant's published JWKS.</div>
         <div class="sig" style="background:rgba(180,150,90,.06);border:1px solid rgba(180,150,90,.22)">
@@ -2206,7 +2251,7 @@
         <div class="f v">
           <div class="dt dtv"></div>
           <div class="fc"><span class="fn">alg</span> <span class="fv">= "ES256"</span><span
-              class="rq r">REQ</span><span class="fd">Algorithm that was used to sign the token.</span></div>
+              class="rq r">REQ</span><span class="fd">Signing algorithm. ECDSA P-256 + SHA-256.</span></div>
         </div>
         <div class="f v">
           <div class="dt dtv"></div>
@@ -2279,9 +2324,10 @@
         L2 note-box (whole L2) → L3a sd_hash    (sd_hash = hash of L2 + payment + merchant discl.)
         L2 note-box (whole L2) → L3b sd_hash    (sd_hash = hash of L2 + checkout + item discl.)
     
-      KID MATCH (purple solid): cnf.kid → next layer's header kid
-        L2 checkout cnf.kid    → L3b kid
-        L2 payment cnf.kid     → L3a kid
+      KID MATCH (purple solid): cnf.jwk (whose .kid sub-field) → next layer's header kid
+        L1 cnf.jwk.kid         → L2 header kid
+        L2 checkout cnf.jwk    → L3b kid
+        L2 payment cnf.jwk     → L3a kid
     
       CROSS-REFERENCE (yellow dashed, no arrowhead — equality):
         L3a transaction_id     ↔ L3b checkout_hash
@@ -2363,14 +2409,16 @@
       { f: 'a1cnf', t: 'a2sig', c: 'key', fs: 'r', ts: 'l' },
       // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
       { f: 'a1border', t: 'a2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // KID: L1 cnf.jwk.kid → L2 header kid (verifier matches L2 kid against L1 cnf.jwk.kid)
+      { f: 'a1cnfkid', t: 'a2kid', c: 'kid', fs: 'r', ts: 'l' },
       // KEY: L2 payment cnf.jwk → L3a signature (agent key signs L3a)
       { f: 'a2pjwk', t: 'a3asig', c: 'key', fs: 'r', ts: 'l' },
       // KEY: L2 checkout cnf.jwk → L3b signature (agent key signs L3b)
       { f: 'a2cjwk', t: 'a3bsig', c: 'key', fs: 'r', ts: 'l' },
-      // KID: L2 payment cnf.kid → L3a kid (verifier matches kid values)
-      { f: 'a2pkid', t: 'a3akid', c: 'kid', fs: 'r', ts: 'l' },
-      // KID: L2 checkout cnf.kid → L3b kid (verifier matches kid values)
-      { f: 'a2ckid', t: 'a3bkid', c: 'kid', fs: 'r', ts: 'l' },
+      // KID: L2 payment cnf.jwk → L3a kid (verifier matches L3a kid against L2 payment cnf.jwk.kid)
+      { f: 'a2pjwk', t: 'a3akid', c: 'kid', fs: 'r', ts: 'l' },
+      // KID: L2 checkout cnf.jwk → L3b kid (verifier matches L3b kid against L2 checkout cnf.jwk.kid)
+      { f: 'a2cjwk', t: 'a3bkid', c: 'kid', fs: 'r', ts: 'l' },
       // HASH: L2 (whole+discl) → L3a sd_hash (L3a hashes L2 + payment + merchant disclosures)
       { f: 'a2hash', t: 'a3ash', c: 'hash', fs: 'r', ts: 'l', d: 1 },
       // HASH: L2 (whole+discl) → L3b sd_hash (L3b hashes L2 + checkout + item disclosures)
@@ -2387,6 +2435,8 @@
       { f: 'i1cnf', t: 'i2sig', c: 'key', fs: 'r', ts: 'l' },
       // HASH: L1 (whole) → L2 sd_hash (L2 hashes entire serialized L1)
       { f: 'i1border', t: 'i2sh', c: 'hash', fs: 'r', ts: 'l', d: 1 },
+      // KID: L1 cnf.jwk.kid → L2 header kid
+      { f: 'i1cnfkid', t: 'i2kid', c: 'kid', fs: 'r', ts: 'l' },
       // XREF: L2 checkout_hash ↔ L2 transaction_id (equality within same card)
       { f: 'i2ck', t: 'i2tx', c: 'xref', fs: 'r', ts: 'l', a: false, d: 1, pt: 'xref-int' }
     ];
