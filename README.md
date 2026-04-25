@@ -66,27 +66,37 @@ Both L3 credentials are signed by the **Agent** using the key confirmed in L2's 
 
 ```
 verifiableintent_diagram/
-└── index.html   # Self-contained interactive diagram (HTML + CSS + JS)
+├── build/
+│   ├── index.html      # Self-contained interactive diagram (HTML + CSS + JS)
+│   └── robots.txt      # Crawler directives (incl. AI-scraper opt-out)
+├── examples/
+│   ├── L2_SD_JWT_Example.json
+│   └── intentAutonomous_display_v2.json
+└── render.yaml         # Render.com static-site deployment config
 ```
 
-No build step, no dependencies, no server required.
+No build step, no dependencies, no server required for local viewing.
 
 ---
 
 ## Usage
 
-Open `index.html` directly in any modern browser:
+Open `build/index.html` directly in any modern browser:
 
 ```
 # Windows
-start index.html
+start build\index.html
 
 # macOS
-open index.html
+open build/index.html
 
 # Linux
-xdg-open index.html
+xdg-open build/index.html
 ```
+
+### Deployment
+
+The repo ships with a `render.yaml` that deploys `build/` as a static site on [Render](https://render.com), with `X-Robots-Tag: noai, noimageai, noarchive` and `X-Content-Type-Options: nosniff` headers applied to every path.
 
 ---
 

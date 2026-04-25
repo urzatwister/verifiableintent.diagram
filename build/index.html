@@ -1083,7 +1083,8 @@
                 MUST be signed by matching
                 private key.</span>
               <div class="fo-body">
-                <div class="sf" id="a1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf" id="a1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier
+                </div>
                 <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
                 <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
                 <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
@@ -1135,6 +1136,15 @@
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
                 class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
                 "sha-512".</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">_sd</span> <span class="fv">= [ ... ]</span><span
+                class="rq r">REQ</span><span class="fd">Array of SD-JWT disclosure hashes for selectively disclosable
+                claims.</span>
+              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
+                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
+            </div>
           </div>
 
           <div class="sig l1" style="margin-top: 12px;">
@@ -1639,7 +1649,7 @@
           </div>
           <div class="f s fo">
             <div class="dt dts"></div>
-            <div class="fc"><span class="fn">amount</span><span class="rq r">REQ</span><span
+            <div class="fc"><span class="fn">payment_amount</span><span class="rq r">REQ</span><span
                 class="fo-chv">▶</span><span class="fd">{currency, amount} in minor units. Verified against L2
                 constraints.</span>
               <div class="fo-body">
@@ -1938,7 +1948,8 @@
                 class="rq r">REQ</span><span class="fo-chv">▶</span><span class="fd">User's public key. Only they sign
                 L2.</span>
               <div class="fo-body">
-                <div class="sf" id="i1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier</div>
+                <div class="sf" id="i1cnfkid"><span class="sfn">kid</span> <span class="sfr r">REQ</span> key identifier
+                </div>
                 <div class="sf"><span class="sfn">kty</span> <span class="sfr r">REQ</span> "EC" only</div>
                 <div class="sf"><span class="sfn">crv</span> <span class="sfr r">REQ</span> "P-256" curve</div>
                 <div class="sf"><span class="sfn">x</span> <span class="sfr r">REQ</span> x coordinate base64url</div>
@@ -1986,6 +1997,15 @@
             <div class="fc"><span class="fn">_sd_alg</span> <span class="fv">= "sha-256"</span><span
                 class="rq r">REQ</span><span class="fd">Hashing algorithm for selective disclosure. "sha-256" or
                 "sha-512".</span></div>
+          </div>
+          <div class="f v">
+            <div class="dt dtv"></div>
+            <div class="fc"><span class="fn">_sd</span> <span class="fv">= [ ... ]</span><span
+                class="rq r">REQ</span><span class="fd">Array of SD-JWT disclosure hashes for selectively disclosable
+                claims.</span>
+              <div class="xr" style="border-color:var(--l1b);margin-top:3px"><span class="xh"
+                  style="color:var(--l1)">Cross-ref :</span> Email SD · <span class="xv">Hash</span></div>
+            </div>
           </div>
 
           <div class="sig l1" style="margin-top: 12px;">
@@ -2168,16 +2188,17 @@
             </div>
           </div>
         </div>
-        <div class="f s">
+        <div class="f s fo">
           <div class="dt dts"></div>
-          <div class="fc"><span class="fn">currency</span><span class="rq r">REQ</span><span class="fd">ISO 4217 code
-              (e.g. "USD").</span></div>
-        </div>
-        <div class="f s">
-          <div class="dt dts"></div>
-          <div class="fc"><span class="fn">amount</span><span class="rq r">REQ</span><span class="fd">Minor units
-              (e.g.
-              27999 = $279.99).</span></div>
+          <div class="fc"><span class="fn">payment_amount</span><span class="rq r">REQ</span><span
+              class="fo-chv">▶</span><span class="fd">{currency, amount} in minor units.</span>
+            <div class="fo-body">
+              <div class="sf"><span class="sfn">currency</span> <span class="sfr r">REQ</span> ISO 4217 (e.g. "USD")
+              </div>
+              <div class="sf"><span class="sfn">amount</span> <span class="sfr r">REQ</span> integer minor units (e.g.
+                27999 = $279.99)</div>
+            </div>
+          </div>
         </div>
         <div class="f s fo">
           <div class="dt dts"></div>
